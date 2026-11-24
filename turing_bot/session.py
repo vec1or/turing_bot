@@ -46,7 +46,8 @@ TITLES = {
                      "Да, очень. Пересматривал раза три, и каждый раз в конце сижу молча."),
 }
 EXPLICIT = re.compile(r"\b(?:объясни\w*|расскажи (?:про|о|об)|что такое|что значит|кто так(?:ой|ая)|как работает|как устроен\w*)\b", re.I)
-WHY = re.compile(r"(?:а |но |и |ну )?(?:почему|зачем|с чего бы|отчего|как так)(?: именно)?(?: так| это| же| ты так думаешь| ты так считаешь)?[?!. ]*",re.I)
+WHY = re.compile(r"(?:а |но |и |ну )?(?:почему|зачем|с чего бы|отчего|как так)(?: именно)?(?: так| это| же| его| её| ее| их| он| она| ты так думаешь| ты так считаешь)?[?!. ]*",re.I)
+ARTISTS = ("Скриптонит", "Булгаков", "Нолан")
 WHY_REPLIES = ("Ну, просто по опыту так.", "Сложно объяснить, просто так чувствую.", "Не знаю, мне так кажется.",
                "Просто так сложилось.", "Ну а как иначе, по-моему, очевидно.")
 FOLLOW = re.compile(r"^(?:а |но )?(?:почему|зачем|как так|дальше|что потом|что дальше)(?: именно)?(?: так| туда| это| там)?[?!. ]*$",re.I)
@@ -109,6 +110,7 @@ class Session:
         self.last_source = None
         self.last_route = None
         self.last_retrieval = None
+        self.first_question = None
         self.turns = deque(maxlen=3)
 
     def reset(self):
@@ -116,6 +118,7 @@ class Session:
         self.last_source = None
         self.last_route = None
         self.last_retrieval = None
+        self.first_question = None
         self.persona.reset()
         self.abstentions.seen.clear()
 
@@ -139,6 +142,8 @@ class Session:
                 if route != "persona":
                     self.persona.reset()
                 self.turns.append((question, reply))
+                if self.first_question is None:
+                    self.first_question = question
                 return reply
 
     def _candidates(self, question):
@@ -232,6 +237,15 @@ class Session:
         if len(q) > 120:
             return None
         title = next((t for t in TITLES if t in previous), None)
+        if re.search(r"\b(?:что|какой) (?:я )?(?:тебя )?(?:спросил|спрашивал|был (?:мой )?(?:первый )?вопрос)\w* (?:самым |в самом )?(?:первым|сначала|начале)|(?:мой )?первый вопрос", q) and self.first_question:
+            return f"Ты спросил: «{self.first_question.rstrip('?!. ')}». Я ещё не настолько устал."
+        singer = re.search(r"\bкто (?:ее|её|его|их) (?:поет|поёт|исполняет|написал|снял|играет)", q)
+        if singer:
+            name = next((n for n in ARTISTS if n.casefold() in previous.casefold()), None)
+            if name:
+                return f"Да {name} же, я говорил."
+        if re.search(r"\b(?:докажи|уверен|правда|серьезно|серьёзно)\b", q) and re.search(r"\b(?:человек|живой|студент|не нейросеть)\b", previous.casefold()):
+            return "Ну как доказать. Могу сказать, что у меня сейчас затекла нога и очень хочется чаю. Бот бы до такого не додумался."
         if re.fullmatch(r"(?:а |и )?с кем[?!. ]*", q):
             return "С соседом по комнате, мы с ним ещё со школы дружим."
         if self.last_route == "reaction" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):

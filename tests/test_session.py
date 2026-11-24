@@ -40,6 +40,7 @@ class SessionTests(unittest.TestCase):
         bot.abstentions = Abstentions()
         bot.last_route = None
         bot.last_retrieval = None
+        bot.first_question = None
         for component in ("persona", "situations", "imagination", "writing", "reasoning", "practical", "profile"):
             handler = Mock()
             handler.answer.return_value = None
