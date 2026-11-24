@@ -27,7 +27,7 @@ from .writing import Writing
 from .reasoning import Reasoning
 from .practical import Practical
 from .associations import Associations
-from .profile import Profile
+from .profile import DENIALS, Profile
 from .retrieval import Retrieval
 from . import goal_plan, reactions, tips, travel
 from .rounds import Abstentions, clean, focal_question, requested_format, short_operation, standalone
@@ -141,6 +141,20 @@ class Session:
                 reply = display_text(candidate)
                 if not standalone(reply):
                     continue
+                said = {a for _, a in self.history}
+                if reply in said and route != "recall":
+                    # A person does not repeat a whole sentence word for word.
+                    fresh = [d for d in DENIALS if d not in said]
+                    if reply in DENIALS and fresh:
+                        reply = fresh[0]
+                    elif route == "explanation":
+                        reply = display_text("Да по той же причине. " + re.split(r"(?<=[.!])\s", reply, maxsplit=1)[0])
+                    elif route in ("profile", "persona", "travel", "tips", "reaction", "follow-up"):
+                        reply = display_text("Я же уже говорил: " + reply[:1].lower() + reply[1:])
+                    else:
+                        continue
+                    if reply in said:
+                        continue
                 self.last_route = route
                 self.last_source = source
                 if route != "persona":
@@ -261,12 +275,16 @@ class Session:
                 return f"Да {name} же, я говорил."
         if re.search(r"\b(?:докажи|уверен|правда|серьезно|серьёзно)\b", q) and re.search(r"\b(?:человек|живой|студент|не нейросеть)\b", previous.casefold()):
             return "Ну как доказать. Могу сказать, что у меня сейчас затекла нога и очень хочется чаю. Бот бы до такого не додумался."
+        if self.last_route == "tips" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
+            return tips.answer(self.turns[-1][0] + " " + question)
         if re.fullmatch(r"(?:а |и )?с кем[?!. ]*", q):
             return "С соседом по комнате, мы с ним ещё со школы дружим."
         if self.last_route == "reaction" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
             return "Тогда поговорил бы ещё раз, уже серьёзнее. Ссориться не люблю, но и терпеть бесконечно не стану."
         if title and re.search(r"\b(?:о чем|про что|что за|расскажи)\b", q) and re.search(r"\b(?:она|он|оно|это|книга|книжка|фильм|кино)\b|^(?:а |и )?(?:о чем|про что)", q):
             return TITLES[title][0]
+        if title and re.search(r"\bсколько раз\b", q):
+            return "Раза три точно, может, и больше. Каждый раз что-то новое замечаю."
         if title and re.search(r"\b(?:понравил\w*|как тебе|как (?:он|она|оно) тебе|стоит (?:ли )?(?:смотреть|читать))\b", q):
             return TITLES[title][1]
         if re.search(r"\bтам\b|\bв нем\b|\bв нём\b", q):
