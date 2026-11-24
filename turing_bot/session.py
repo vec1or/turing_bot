@@ -112,6 +112,7 @@ class Session:
         self.last_retrieval = None
         self.first_question = None
         self.first_answer = None
+        self.history = deque(maxlen=60)
         self.turns = deque(maxlen=3)
 
     def reset(self):
@@ -121,6 +122,7 @@ class Session:
         self.last_retrieval = None
         self.first_question = None
         self.first_answer = None
+        self.history.clear()
         self.persona.reset()
         self.abstentions.seen.clear()
 
@@ -144,6 +146,7 @@ class Session:
                 if route != "persona":
                     self.persona.reset()
                 self.turns.append((question, reply))
+                self.history.append((question, reply))
                 if self.first_question is None:
                     self.first_question = question
                     self.first_answer = reply
@@ -155,6 +158,13 @@ class Session:
             yield "recall", previous, None
         if self.turns and self.first_answer and re.search(r"\bперв\w*", question, re.I) and re.search(r"\b(?:ответил|сказал|отвечал)\w*", question, re.I):
             yield "recall", f"Сказал: «{self.first_answer.rstrip('.')}». Помню, помню."[:300], None
+        about = re.search(r"\bчто (?:ты )?(?:отвечал|ответил|сказал|говорил|писал)\w* (?:про|о|об|насчет|насчёт) ([а-яё]{3,})", question.casefold())
+        if about and self.history:
+            stem = about[1][:5]
+            for earlier_q, earlier_a in reversed(self.history):
+                if stem in earlier_q.casefold() or stem in earlier_a.casefold():
+                    yield "recall", f"Я сказал: «{earlier_a.rstrip('.')}».", None
+                    break
         if self.turns and REPEAT.search(question):
             previous = self.turns[-1][1]
             if len(previous) > 120:
