@@ -73,3 +73,12 @@ class SessionTests(unittest.TestCase):
             self.assertNotIn(rows[0]["response"], raw)
             model = WordModel(json.loads(raw))
             self.assertTrue(model.candidates("Куда летит ракета?"))
+
+
+class NameMemoryTests(unittest.TestCase):
+    def test_user_name_is_remembered(self):
+        from turing_bot.session import Session
+        s = Session()
+        self.assertIn("не говорил", s.answer("Как меня зовут?"))
+        self.assertIn("Арман", s.answer("Меня Арман зовут, запомнил?"))
+        self.assertIn("Арман", s.answer("А теперь скажи, как меня зовут"))

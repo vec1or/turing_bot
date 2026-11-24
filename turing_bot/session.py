@@ -140,6 +140,7 @@ class Session:
         self.last_retrieval = None
         self.first_question = None
         self.first_answer = None
+        self.user_name = None
         self.history = deque(maxlen=60)
         self.turns = deque(maxlen=3)
 
@@ -150,6 +151,7 @@ class Session:
         self.last_retrieval = None
         self.first_question = None
         self.first_answer = None
+        self.user_name = None
         self.history.clear()
         self.persona.reset()
         self.abstentions.seen.clear()
@@ -206,6 +208,17 @@ class Session:
                 return reply
 
     def _candidates(self, question):
+        asks_name = re.search(r"как меня зовут|мо[её] имя|помнишь,? как меня", question, re.I)
+        intro = None if asks_name else (re.search(r"\b(?:меня зовут|мо[её] имя|зови меня)\s+([А-ЯЁA-Zа-яё][а-яёa-z]{2,})", question, re.I)
+                                       or re.search(r"\bменя\s+(?!все|так|тоже|никак|вообще)([а-яё]{3,})\s+зовут", question, re.I))
+        if intro:
+            self.user_name = intro[1][:1].upper() + intro[1][1:].lower()
+            yield "persona", f"Запомнил, {self.user_name}. Приятно познакомиться, я Тимур.", None
+        if asks_name:
+            if self.user_name:
+                yield "recall", f"{self.user_name}, конечно. Ты же говорил, я запомнил.", None
+            else:
+                yield "recall", "Ты же не говорил, как тебя зовут. Скажи — запомню.", None
         if self.turns and self.last_route != "fallback" and RECALL_SELF.fullmatch(question):
             previous = self.turns[-1][1]
             yield "recall", previous, None
@@ -452,6 +465,10 @@ class Session:
             return "Ответил бы за всех на экзамене и прочитал бы весь интернет. А потом, наверное, заскучал бы без бешбармака."
         if re.search(r"попадал в так|сам (?:\w+ )?попадал|с тобой (?:\w+ )?(?:такое )?было", q):
             return "Было пару раз что-то похожее. Тогда я примерно так и сделал, и вроде нормально вышло."
+        if re.search(r"плов|яичниц|бешбармак|гречк", previous) and re.search(r"рецепт|как готов|как делаешь", q):
+            return "Да какой там рецепт: мясо, морковь, лук, рис, всё в казан и не мешать. Главное — не торопиться, а я всегда тороплюсь."
+        if re.search(r"анекдот|шутк", earlier) and re.search(r"другой|ещ[её] один|уже слышал|старый|баян", q):
+            return "Ладно, другой. Препод: «Почему опоздал». Студент: «Там знак висел — „Осторожно, дети“. Вот я и ехал осторожно»."
         if "отложил" in previous and re.search(r"поездк|путешеств", q):
             return "Так Япония — это и есть поездка. Просто сначала родителям, а потом уже себе."
         if "отложил" in previous and re.search(r"не отложил|почему не|зачем трат", q):
@@ -489,7 +506,7 @@ class Session:
             return "Говорят, развивает пространственное мышление. Может, и развивает, но я пока только кубы научился рисовать."
         if re.search(r"забыл", earlier) and re.search(r"обиделась|не отвечает|игнор", q):
             return "Тогда не спамить, а написать одно нормальное сообщение и прийти лично, с цветами. Переписка тут уже не спасёт."
-        if re.search(r"\b(?:чего|почему|че|чё|что) (?:так|ты так) поздно", q):
+        if re.search(r"\b(?:чего|почему|че|чё|что) (?:так|ты так) поздно|(?:занимался|делал) (?:\w+ )?так поздно", q):
             return "Да сериал затянул, а потом ещё в телефоне залип. Классика."
         if re.search(r"брос", previous + " " + earlier) and re.search(r"отговар\w*|отговорил\w*", q):
             return "Попробовал бы, да. Но если он всё взвесил и правда знает, чем будет заниматься, — это его жизнь, я бы поддержал."
