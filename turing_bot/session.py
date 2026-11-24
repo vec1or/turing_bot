@@ -244,6 +244,8 @@ class Session:
             yield "travel", travel.answer(question), None
         yield "profile", self.profile.answer(question), None
         yield "goal-plan", goal_plan.answer(question), None
+        if self.turns and re.search(r"анекдот|шутк|пошути", self.turns[-1][0], re.I) and re.search(r"смешн|смеш", question, re.I):
+            yield "follow-up", self._follow_up(question), None
         yield "explanation", explain(question), None
         # Resolve a request for direct speech before planning a practical action.
         # A problem in the premise (e.g. lateness) need not be the requested task.
@@ -343,6 +345,12 @@ class Session:
             return "Как-то перед контрольной всей группе объяснял пределы на перемене, вот и прилипло. Я не против."
         if "чавка" in earlier and re.search(r"\b(?:сам|ты)\b.{0,20}чавка", q):
             return "Может, и чавкал, со стороны себя не слышно. Но если что, мне бы сказали, у нас в группе с этим не стесняются."
+        if "гречку" in previous and re.search(r"\b(?:зачем|почему|нафига)\b", q):
+            return "Ну чтобы не пригорала, логично же. Ерлан уже грозится отобрать у меня кастрюлю."
+        if "геометри" in previous and re.search(r"\b(?:зачем|почему)\b", q):
+            return "Говорят, развивает пространственное мышление. Может, и развивает, но я пока только кубы научился рисовать."
+        if re.search(r"забыл", earlier) and re.search(r"обиделась|не отвечает|игнор", q):
+            return "Тогда не спамить, а написать одно нормальное сообщение и прийти лично, с цветами. Переписка тут уже не спасёт."
         if re.search(r"\b(?:чего|почему|че|чё|что) (?:так|ты так) поздно", q):
             return "Да сериал затянул, а потом ещё в телефоне залип. Классика."
         if re.search(r"брос", previous + " " + earlier) and re.search(r"отговар\w*|отговорил\w*", q):
