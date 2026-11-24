@@ -173,6 +173,14 @@ class Session:
                 if not standalone(reply):
                     continue
                 said = {a for _, a in self.history}
+                if reply in said and route != "recall" and route in ("profile", "persona", "travel", "tips", "follow-up"):
+                    # Only a re-asked question earns «я же говорил»; a keyword
+                    # collision should fall through to the next candidate.
+                    earlier_q = next((eq for eq, ea in self.history if ea == reply), "")
+                    words = lambda t: {w for w in re.findall(r"[а-яё]{4,}", t.casefold())}
+                    a, b = words(earlier_q), words(question)
+                    if a and b and len(a & b) / min(len(a), len(b)) < 0.5:
+                        continue
                 if reply in said and route != "recall":
                     # A person does not repeat a whole sentence word for word.
                     fresh = [d for d in DENIALS if d not in said]
@@ -334,6 +342,12 @@ class Session:
             return "Как-то перед контрольной всей группе объяснял пределы на перемене, вот и прилипло. Я не против."
         if "чавка" in earlier and re.search(r"\b(?:сам|ты)\b.{0,20}чавка", q):
             return "Может, и чавкал, со стороны себя не слышно. Но если что, мне бы сказали, у нас в группе с этим не стесняются."
+        if re.search(r"подар", previous + " " + earlier) and re.search(r"ничего не (?:надо|нужно)", q):
+            return "Все так говорят. Значит, нужно что-то небольшое, но от себя: открытка или её любимые сладости."
+        if re.search(r"друз|дружить", previous + " " + earlier) and re.search(r"\bсмог\w* (?:бы )?(?:\w+ )?дружить|\bты бы (?:сам )?(?:смог|стал) дружить", q):
+            return "Не сразу. Сначала надо переболеть, а там, может, и получится нормально общаться."
+        if "Японию" in previous and re.search(r"\b(?:куда|почему|зачем)\b", q):
+            return "Япония, Токио. Давно мечтаю, там сильная робототехника, и вообще интересно пожить в другой культуре."
         if "Пробовал в школе" in previous and re.search(r"\bродител\w*|\bмам\w*|\bпап\w*", q):
             return "Про тот раз в школе — нет, и надеюсь, не узнают."
         if re.search(r"«[^»]+»", previous) and re.search(r"(?:уже|я его|я это) (?:\w+ )?(?:смотрел|видел|читал)|смотрел уже|видел уже", q):
