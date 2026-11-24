@@ -236,6 +236,8 @@ class Persona:
         # Long unframed clauses are usually subquestions or requests for advice.
         if not DIRECT_CHOICE.search(norm) and not PERSON.search(norm) and mode!="between" and max(map(lambda p:len(_words(p)),parts))>3:
             return None
+        if max(len(_words(p)) for p in parts) > 4:
+            return None
         ranked = [(_rank(part),i,part) for i,part in enumerate(parts)]
         (score, reason), index, selected = max(ranked,key=lambda item:item[0][0])
         if not reason or score[0] < 0:

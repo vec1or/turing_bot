@@ -201,7 +201,7 @@ class Session:
         if self.turns and self.last_route != "fallback" and RECALL_SELF.fullmatch(question):
             previous = self.turns[-1][1]
             yield "recall", previous, None
-        if self.turns and self.first_answer and re.search(r"\bперв\w*", question, re.I) and re.search(r"\b(?:ответил|сказал|отвечал)\w*", question, re.I):
+        if self.turns and self.first_answer and re.search(r"\bперв\w* (?:вопрос|раз)\w*|в (?:самом )?начале", question, re.I) and re.search(r"\b(?:ты )?(?:ответил|сказал|отвечал)\w*", question, re.I):
             yield "recall", f"Сказал: «{self.first_answer.rstrip('.')}». Помню, помню."[:300], None
         about = re.search(r"\bчто (?:ты )?(?:отвечал|ответил|сказал|говорил|писал)\w* (?:про|о|об|насчет|насчёт) ([а-яё]{3,})", question.casefold())
         if about and self.history:
@@ -328,6 +328,13 @@ class Session:
         if re.search(r"\b(?:что|какой) (?:я )?(?:тебя )?(?:спросил|спрашивал|был (?:мой )?(?:первый )?вопрос)\w* (?:самым |в самом )?(?:первым|сначала|начале)|(?:мой )?первый вопрос", q) and self.first_question:
             quoted = re.sub(r"\?\s*", ". ", self.first_question).strip(" .!")
             return f"Ты спросил: «{quoted}». Я ещё не настолько устал."
+        earlier = self.turns[-1][0].casefold()
+        if "Профессор" in previous and re.search(r"\b(?:откуда|почему|как) (?:\w+ )?(?:взял\w*|появил\w*|так|прозвал\w*)|\bпочему профессор", q):
+            return "Как-то перед контрольной всей группе объяснял пределы на перемене, вот и прилипло. Я не против."
+        if "чавка" in earlier and re.search(r"\b(?:сам|ты)\b.{0,20}чавка", q):
+            return "Может, и чавкал, со стороны себя не слышно. Но если что, мне бы сказали, у нас в группе с этим не стесняются."
+        if re.search(r"\bпарень|\bпарня", earlier) and re.search(r"^(?:а |и )?(?:если|вдруг) (?:она|он) (?:сама |сам )?(?:первая |первый )?(?:пишет|пишут|звонит|зовет|зовёт)", q):
+            return "Тогда, может, у них там не всё так серьёзно. Но я бы всё равно не торопился, пусть она сама сначала разберётся со своим парнем."
         singer = re.search(r"\bкто (?:ее|её|его|их) (?:поет|поёт|исполняет|написал|снял|играет)", q)
         if singer:
             name = next((n for n in ARTISTS if n.casefold() in previous.casefold()), None)
