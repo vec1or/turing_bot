@@ -262,9 +262,9 @@ class Session:
         # removed from the chain in 3.0: blind checks found them mostly
         # meaningless. Their code and weights remain for comparison.
         yield "retrieval", self._retrieve(question, RETRIEVAL_THRESHOLD), None
-        # Authored situation plans match loosely; they are used only when no
-        # real reply is close enough.
-        yield "situation", self.situations.answer(question), None
+        # The authored situation plans of 2.x matched too loosely (blind
+        # rounds found bureaucratic texts on unrelated questions); in 3.0 they
+        # are no longer part of the chain.
         yield "fallback", self.abstentions.answer(question), None
 
     def _follow_up(self, question):
@@ -290,6 +290,12 @@ class Session:
                 return "Если совсем коротко: " + first[:1].lower() + first[1:] + "."
         if self.last_route == "tips" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
             return tips.answer(self.turns[-1][0] + " " + question)
+        if re.search(r"\b(?:предыдущ|прошл|последн)\w* (?:мой |твой )?вопрос\w*|(?:что|какой) я (?:только что|сейчас) (?:спросил|спрашивал)", q):
+            quoted = re.sub(r"\?\s*", ". ", self.turns[-1][0]).strip(" .!")
+            return f"Ты спросил: «{quoted}»."
+        if self.profile.last_choice and re.search(r"\bдруг(?:ой|ое|ую) вариант|\bвтор(?:ой|ое) вариант|если бы (?:пришлось|надо|нужно) (?:выбрать )?(?:друг|втор)", q):
+            other = self.profile.last_choice[1]
+            return f"Ну тогда {other}. Но уже без особого энтузиазма."
         if re.fullmatch(r"(?:а |и )?с кем[?!. ]*", q):
             return "С соседом по комнате, мы с ним ещё со школы дружим."
         if self.last_route == "reaction" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
