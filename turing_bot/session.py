@@ -288,6 +288,10 @@ class Session:
             first = re.split(r"(?<=[.!])\s", previous, maxsplit=1)[0].rstrip(".")
             if len(first) > 15:
                 return "Если совсем коротко: " + first[:1].lower() + first[1:] + "."
+        if self.last_route == "explanation" and re.search(r"\bкак (?:это |его |её |ее )?(?:\w+ )?(?:убрать|исправить|избежать|помочь|справиться|остановить|вылечить|ускорить|замедлить)", q):
+            parts = re.split(r"(?<=[.!])\s", previous, maxsplit=1)
+            if len(parts) == 2:
+                return "Да проще всего так: " + parts[1][:1].lower() + parts[1][1:]
         if self.last_route == "tips" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
             return tips.answer(self.turns[-1][0] + " " + question)
         if re.search(r"\b(?:предыдущ|прошл|последн)\w* (?:мой |твой )?вопрос\w*|(?:что|какой) я (?:только что|сейчас) (?:спросил|спрашивал)", q):
@@ -296,6 +300,8 @@ class Session:
         if self.profile.last_choice and re.search(r"\bдруг(?:ой|ое|ую) вариант|\bвтор(?:ой|ое) вариант|если бы (?:пришлось|надо|нужно) (?:выбрать )?(?:друг|втор)", q):
             other = self.profile.last_choice[1]
             return f"Ну тогда {other}. Но уже без особого энтузиазма."
+        if re.search(r"\b(?:что|чего) (?:тут |в этом |же )?смешного\b", q):
+            return "Ну мне смешно было. Видимо, надо посидеть на первой паре, чтобы понять."
         if re.fullmatch(r"(?:а |и )?с кем[?!. ]*", q):
             return "С соседом по комнате, мы с ним ещё со школы дружим."
         if self.last_route == "reaction" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):

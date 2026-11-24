@@ -105,6 +105,8 @@ def answer(question):
     # A city alone is not enough: the question must be about arriving there.
     if city is None and not re.search(r"\b(?:город|страну|стран[еу]|столиц\w*|в [а-яе-]+(?:у|ь|ск|ы|и)\b)", norm):
         return None
+    if city is CITIES["astana"] and re.search(r"\b(?:трц|торгов\w* центр\w*|надоел\w*)", norm):
+        return "Тогда на набережную Есиля, в Ботанический сад или в Национальный музей. А зимой — на каток в Центральном парке."
     data = city or GENERIC
     if sights and city is None:
         return None
