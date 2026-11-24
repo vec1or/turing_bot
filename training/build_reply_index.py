@@ -77,9 +77,13 @@ def main():
         np.save(out / f"contexts-{n:02d}.npy", quant[start:start + per])
     np.save(out / "scales.npy", scales.astype(np.float16))
     np.savez(out / "pca.npz", mean=mean.astype(np.float32), components=components.astype(np.float32))
-    with gzip.open(out / "replies.jsonl.gz", "wt", encoding="utf-8") as stream:
-        for r in rows:
-            stream.write(json.dumps(dict(c=r["c"], r=r["r"]), ensure_ascii=False) + "\n")
+    for old in out.glob("replies*.jsonl.gz"):
+        old.unlink()
+    per_part = 700000  # keeps each compressed part under 50 MB
+    for n, start in enumerate(range(0, len(rows), per_part)):
+        with gzip.open(out / f"replies-{n:02d}.jsonl.gz", "wt", encoding="utf-8") as stream:
+            for r in rows[start:start + per_part]:
+                stream.write(json.dumps(dict(c=r["c"], r=r["r"]), ensure_ascii=False) + "\n")
     for name in ("encoder.json", "encoder.npz", "training-report.json"):
         if (folder / name).resolve() != (out / name).resolve():
             shutil.copyfile(folder / name, out / name)

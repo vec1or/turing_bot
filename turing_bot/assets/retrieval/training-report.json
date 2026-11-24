@@ -1,0 +1,439 @@
+{
+ "args": {
+  "pairs": "/home/kalzh/projects/turing-train/prepared2/train.jsonl",
+  "valid": "/home/kalzh/projects/turing-train/prepared2/valid.jsonl",
+  "vocab": "/home/kalzh/projects/turing-train/model2/encoder.json",
+  "vocab_size": 8192,
+  "out": "/home/kalzh/projects/turing-train/model3",
+  "steps": 40000,
+  "batch": 384,
+  "lr": 0.0004,
+  "layers": 3,
+  "dim": 256,
+  "device": "cuda",
+  "seed": 13,
+  "limit": null,
+  "init": "/home/kalzh/projects/turing-train/model2/checkpoint.pt",
+  "warmup": 300
+ },
+ "train_pairs": 4775148,
+ "valid_pairs": 5000,
+ "log": [
+  {
+   "step": 500,
+   "loss": 3.9006,
+   "seconds": 46
+  },
+  {
+   "step": 1000,
+   "loss": 3.8305,
+   "seconds": 88
+  },
+  {
+   "step": 1500,
+   "loss": 3.6716,
+   "seconds": 133
+  },
+  {
+   "step": 2000,
+   "loss": 3.8375,
+   "seconds": 176
+  },
+  {
+   "step": 2500,
+   "loss": 3.7583,
+   "seconds": 221,
+   "recall@1_of_100": 0.5706
+  },
+  {
+   "step": 3000,
+   "loss": 3.7567,
+   "seconds": 266
+  },
+  {
+   "step": 3500,
+   "loss": 3.7817,
+   "seconds": 312
+  },
+  {
+   "step": 4000,
+   "loss": 3.7427,
+   "seconds": 355
+  },
+  {
+   "step": 4500,
+   "loss": 3.8435,
+   "seconds": 401
+  },
+  {
+   "step": 5000,
+   "loss": 3.7676,
+   "seconds": 446,
+   "recall@1_of_100": 0.577
+  },
+  {
+   "step": 5500,
+   "loss": 3.7017,
+   "seconds": 493
+  },
+  {
+   "step": 6000,
+   "loss": 3.7115,
+   "seconds": 537
+  },
+  {
+   "step": 6500,
+   "loss": 3.6185,
+   "seconds": 583
+  },
+  {
+   "step": 7000,
+   "loss": 3.7063,
+   "seconds": 627
+  },
+  {
+   "step": 7500,
+   "loss": 3.7482,
+   "seconds": 671,
+   "recall@1_of_100": 0.587
+  },
+  {
+   "step": 8000,
+   "loss": 3.8489,
+   "seconds": 718
+  },
+  {
+   "step": 8500,
+   "loss": 3.6279,
+   "seconds": 762
+  },
+  {
+   "step": 9000,
+   "loss": 3.6664,
+   "seconds": 808
+  },
+  {
+   "step": 9500,
+   "loss": 3.7306,
+   "seconds": 852
+  },
+  {
+   "step": 10000,
+   "loss": 3.4882,
+   "seconds": 899,
+   "recall@1_of_100": 0.59
+  },
+  {
+   "step": 10500,
+   "loss": 3.5755,
+   "seconds": 943
+  },
+  {
+   "step": 11000,
+   "loss": 3.6062,
+   "seconds": 989
+  },
+  {
+   "step": 11500,
+   "loss": 3.648,
+   "seconds": 1033
+  },
+  {
+   "step": 12000,
+   "loss": 3.5674,
+   "seconds": 1079
+  },
+  {
+   "step": 12500,
+   "loss": 3.4344,
+   "seconds": 1126,
+   "recall@1_of_100": 0.5864
+  },
+  {
+   "step": 13000,
+   "loss": 3.3785,
+   "seconds": 1173
+  },
+  {
+   "step": 13500,
+   "loss": 3.4264,
+   "seconds": 1217
+  },
+  {
+   "step": 14000,
+   "loss": 3.5856,
+   "seconds": 1261
+  },
+  {
+   "step": 14500,
+   "loss": 3.6995,
+   "seconds": 1308
+  },
+  {
+   "step": 15000,
+   "loss": 3.457,
+   "seconds": 1352,
+   "recall@1_of_100": 0.602
+  },
+  {
+   "step": 15500,
+   "loss": 3.6237,
+   "seconds": 1399
+  },
+  {
+   "step": 16000,
+   "loss": 3.3748,
+   "seconds": 1442
+  },
+  {
+   "step": 16500,
+   "loss": 3.6208,
+   "seconds": 1488
+  },
+  {
+   "step": 17000,
+   "loss": 3.5361,
+   "seconds": 1533
+  },
+  {
+   "step": 17500,
+   "loss": 3.3943,
+   "seconds": 1580,
+   "recall@1_of_100": 0.606
+  },
+  {
+   "step": 18000,
+   "loss": 3.5549,
+   "seconds": 1624
+  },
+  {
+   "step": 18500,
+   "loss": 3.3663,
+   "seconds": 1671
+  },
+  {
+   "step": 19000,
+   "loss": 3.4153,
+   "seconds": 1715
+  },
+  {
+   "step": 19500,
+   "loss": 3.3559,
+   "seconds": 1763
+  },
+  {
+   "step": 20000,
+   "loss": 3.3019,
+   "seconds": 1813,
+   "recall@1_of_100": 0.6132
+  },
+  {
+   "step": 20500,
+   "loss": 3.5497,
+   "seconds": 1858
+  },
+  {
+   "step": 21000,
+   "loss": 3.2648,
+   "seconds": 1905
+  },
+  {
+   "step": 21500,
+   "loss": 3.5126,
+   "seconds": 1948
+  },
+  {
+   "step": 22000,
+   "loss": 3.4796,
+   "seconds": 1995
+  },
+  {
+   "step": 22500,
+   "loss": 3.2086,
+   "seconds": 2039,
+   "recall@1_of_100": 0.617
+  },
+  {
+   "step": 23000,
+   "loss": 3.4225,
+   "seconds": 2083
+  },
+  {
+   "step": 23500,
+   "loss": 3.3988,
+   "seconds": 2130
+  },
+  {
+   "step": 24000,
+   "loss": 3.2885,
+   "seconds": 2174
+  },
+  {
+   "step": 24500,
+   "loss": 3.4045,
+   "seconds": 2220
+  },
+  {
+   "step": 25000,
+   "loss": 3.3019,
+   "seconds": 2267,
+   "recall@1_of_100": 0.623
+  },
+  {
+   "step": 25500,
+   "loss": 3.2847,
+   "seconds": 2314
+  },
+  {
+   "step": 26000,
+   "loss": 3.321,
+   "seconds": 2360
+  },
+  {
+   "step": 26500,
+   "loss": 3.4341,
+   "seconds": 2404
+  },
+  {
+   "step": 27000,
+   "loss": 3.2176,
+   "seconds": 2448
+  },
+  {
+   "step": 27500,
+   "loss": 3.3438,
+   "seconds": 2495,
+   "recall@1_of_100": 0.623
+  },
+  {
+   "step": 28000,
+   "loss": 3.4915,
+   "seconds": 2539
+  },
+  {
+   "step": 28500,
+   "loss": 3.2968,
+   "seconds": 2586
+  },
+  {
+   "step": 29000,
+   "loss": 3.5171,
+   "seconds": 2631
+  },
+  {
+   "step": 29500,
+   "loss": 3.2489,
+   "seconds": 2677
+  },
+  {
+   "step": 30000,
+   "loss": 3.251,
+   "seconds": 2720,
+   "recall@1_of_100": 0.6286
+  },
+  {
+   "step": 30500,
+   "loss": 3.33,
+   "seconds": 2768
+  },
+  {
+   "step": 31000,
+   "loss": 3.2807,
+   "seconds": 2811
+  },
+  {
+   "step": 31500,
+   "loss": 3.1209,
+   "seconds": 2858
+  },
+  {
+   "step": 32000,
+   "loss": 3.1661,
+   "seconds": 2902
+  },
+  {
+   "step": 32500,
+   "loss": 3.3456,
+   "seconds": 2949,
+   "recall@1_of_100": 0.6334
+  },
+  {
+   "step": 33000,
+   "loss": 3.4125,
+   "seconds": 2994
+  },
+  {
+   "step": 33500,
+   "loss": 3.4942,
+   "seconds": 3038
+  },
+  {
+   "step": 34000,
+   "loss": 3.3063,
+   "seconds": 3084
+  },
+  {
+   "step": 34500,
+   "loss": 3.3305,
+   "seconds": 3128
+  },
+  {
+   "step": 35000,
+   "loss": 3.3805,
+   "seconds": 3175,
+   "recall@1_of_100": 0.635
+  },
+  {
+   "step": 35500,
+   "loss": 3.374,
+   "seconds": 3220
+  },
+  {
+   "step": 36000,
+   "loss": 3.3604,
+   "seconds": 3266
+  },
+  {
+   "step": 36500,
+   "loss": 3.3639,
+   "seconds": 3310
+  },
+  {
+   "step": 37000,
+   "loss": 3.3027,
+   "seconds": 3357
+  },
+  {
+   "step": 37500,
+   "loss": 3.1081,
+   "seconds": 3404,
+   "recall@1_of_100": 0.635
+  },
+  {
+   "step": 38000,
+   "loss": 3.3183,
+   "seconds": 3449
+  },
+  {
+   "step": 38500,
+   "loss": 3.1626,
+   "seconds": 3496
+  },
+  {
+   "step": 39000,
+   "loss": 3.2624,
+   "seconds": 3540
+  },
+  {
+   "step": 39500,
+   "loss": 3.2257,
+   "seconds": 3587
+  },
+  {
+   "step": 40000,
+   "loss": 3.2343,
+   "seconds": 3631,
+   "recall@1_of_100": 0.634
+  }
+ ]
+}

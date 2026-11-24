@@ -119,11 +119,23 @@ FEM_PAST = re.compile(r"\b[а-яё]{1,}(?:ала|ила|ыла|ела|яла|о�
 THIRD_FEM = re.compile(r"\b(?:она|ее|её|мама|мать|жена|подруга|девушка|сестра|дочь|дочка|бабушка|кошка|собака|соседка|учительница|жизнь|погода|зима|весна|осень|машина|работа|страна|вода|она-то)\b", re.I)
 
 
+STYLE = re.compile(r"[a-z]|:\)|:\(|:d|\)\)|\(\(|\b(?:вы|вас|вам|ваш\w*|вами)\b|\b(?:мну|шо|чо|ща|щас|нафиг|фиг)\b", re.I)
+
+
 def persona_safe(reply):
+    if STYLE.search(reply):
+        return False
     if FEMININE.search(reply) or BIOGRAPHY.search(reply) or REJECT.search(reply) or "?" in reply:
         return False
     # A feminine past-tense verb without a feminine subject usually speaks of the speaker.
     return not (FEM_PAST.search(reply) and not THIRD_FEM.search(reply))
+
+
+def tidy(reply):
+    """One consistent surface: sentence-initial capitals, no runs of dots."""
+    reply = re.sub(r"\.{2,}", ".", reply).strip()
+    reply = re.sub(r"(^|[.!]\s+)([а-яё])", lambda m: m[1] + m[2].upper(), reply)
+    return reply
 
 
 class Retrieval:
@@ -153,11 +165,12 @@ class Retrieval:
         with np.load(folder / "encoder.npz", allow_pickle=False) as cache:
             weights = {k: np.asarray(cache[k], dtype=np.float32) for k in cache.files}
         replies, contexts = [], []
-        with gzip.open(folder / "replies.jsonl.gz", "rt", encoding="utf-8") as stream:
-            for line in stream:
-                row = json.loads(line)
-                replies.append(row["r"])
-                contexts.append(row["c"])
+        for part in sorted(folder.glob("replies*.jsonl.gz")):
+            with gzip.open(part, "rt", encoding="utf-8") as stream:
+                for line in stream:
+                    row = json.loads(line)
+                    replies.append(row["r"])
+                    contexts.append(row["c"])
         vectors = np.concatenate([np.load(p) for p in sorted(folder.glob("contexts-*.npy"))])
         scales = np.load(folder / "scales.npy").astype(np.float32)
         with np.load(folder / "pca.npz") as pca:
@@ -199,6 +212,6 @@ class Retrieval:
             shape = -.04 if length < 8 else (-.03 if length > 200 else 0.)
             score = .5 * float(dense[j]) + .5 * float(same[j]) + .1 * overlap - .05 * echo + shape
             if best is None or score > best[1]:
-                best = (reply[:1].upper() + reply[1:], score,
+                best = (tidy(reply), score,
                         dict(dense=float(dense[j]), same=float(same[j]), overlap=overlap, context=context, index=i))
         return best

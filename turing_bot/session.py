@@ -38,6 +38,13 @@ RETRIEVAL_THRESHOLD = .72
 RETRIEVAL_STRONG = .78
 RETRIEVAL_MIN_DENSE = .5  # tuned on validation questions, see evaluation/RESULTS-3.0.md
 RECALL_SELF = re.compile(r"^(?:а |напомни[, ]+)?(?:что|какой вариант|какое слово) (?:же )?ты (?:только что |тогда |в итоге )?(?:выбрал|назвал|ответил|предпоч[её]л)а?[?!. ]*$",re.I)
+REPEAT = re.compile(r"(?:предыдущ|прошл|последн)\w* (?:вопрос|ответ)\w*.*(?:ответил|сказал|повтори)|(?:ответил|сказал) на (?:предыдущ|прошл)\w* вопрос|повтори,? (?:что|свой|свои|последн)\w*|что ты (?:только что|сейчас) (?:сказал|ответил)",re.I)
+TITLES = {
+    "Мастер": ("Про то, как дьявол со свитой приезжает в Москву тридцатых, а параллельно про Мастера, который пишет роман о Понтии Пилате. Ну и про любовь, конечно.",
+               "Очень. Перечитываю, и каждый раз как в первый."),
+    "Интерстеллар": ("Земля умирает, и команда летит через червоточину искать новую планету. А по сути это про отца и дочь и про время.",
+                     "Да, очень. Пересматривал раза три, и каждый раз в конце сижу молча."),
+}
 WHY = re.compile(r"(?:а |но |и |ну )?(?:почему|зачем|с чего бы|отчего|как так)(?: именно)?(?: так| это| же| ты так думаешь| ты так считаешь)?[?!. ]*",re.I)
 WHY_REPLIES = ("Ну, просто по опыту так.", "Сложно объяснить, просто так чувствую.", "Не знаю, мне так кажется.",
                "Просто так сложилось.", "Ну а как иначе, по-моему, очевидно.")
@@ -137,6 +144,11 @@ class Session:
         if self.turns and self.last_route != "fallback" and RECALL_SELF.fullmatch(question):
             previous = self.turns[-1][1]
             yield "recall", previous, None
+        if self.turns and REPEAT.search(question):
+            previous = self.turns[-1][1]
+            if len(previous) > 120:
+                previous = previous[:117].rsplit(" ", 1)[0] + "…"
+            yield "recall", f"Ну я же сказал: «{previous.rstrip('.')}».", None
         yield "operation", short_operation(question), None
         yield "reasoning", self.reasoning.answer(question), None
         # A previous *question* from a different spectator is not testimony.
@@ -152,6 +164,7 @@ class Session:
             # «А если он опять опоздает?» continues the reported situation.
             yield "reaction", reactions.answer(self.turns[-1][0] + " " + question.rstrip(" ?") + ". Что ответишь?"), None
         yield "reaction", reactions.answer(question), None
+        yield "reaction", reactions.speech(question), None
         yield "travel", travel.answer(question), None
         yield "profile", self.profile.answer(question), None
         yield "goal-plan", goal_plan.answer(question), None
@@ -164,6 +177,8 @@ class Session:
         yield "persona", self.persona.answer(question), None
         if social:
             yield "social", social[0], None
+        if self.turns:
+            yield "follow-up", self._follow_up(question), None
         if self.turns and self.last_route not in (None, "fallback") and WHY.fullmatch(question.strip()):
             # The reason behind a retrieved reply is unknown; a person answers
             # such a «А почему?» briefly instead of inventing an argument.
@@ -204,6 +219,30 @@ class Session:
         # real reply is close enough.
         yield "situation", self.situations.answer(question), None
         yield "fallback", self.abstentions.answer(question), None
+
+    def _follow_up(self, question):
+        """Continue about a title or a city the student has just named."""
+        previous = self.turns[-1][1]
+        q = question.casefold().replace("ё", "е").strip()
+        if len(q) > 120:
+            return None
+        title = next((t for t in TITLES if t in previous), None)
+        if title and re.search(r"\b(?:о чем|про что|что за|расскажи)\b", q) and re.search(r"\b(?:она|он|оно|это|книга|книжка|фильм|кино)\b|^(?:а |и )?(?:о чем|про что)", q):
+            return TITLES[title][0]
+        if title and re.search(r"\b(?:понравил\w*|как тебе|стоит (?:ли )?(?:смотреть|читать))\b", q):
+            return TITLES[title][1]
+        if re.search(r"\bтам\b|\bв нем\b|\bв нём\b", q):
+            named = [(m.start(), data) for data in travel.CITIES.values()
+                     for m in [re.search(r"\b(?:" + data["pattern"] + r")", previous.casefold())] if m]
+            if named:
+                # The first city named is the one the speaker is talking about.
+                data = min(named, key=lambda item: item[0])[1]
+                for season, expr in travel.SEASONS:
+                    if expr.search(q):
+                        return data[season]
+                if re.search(r"\b(?:холодно|жарко|тепло|погода)\b", q):
+                    return data["winter"] if "холод" in q else data["summer"]
+        return None
 
     def _retrieve(self, question, threshold):
         if self.retrieval is None:

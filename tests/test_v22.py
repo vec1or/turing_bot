@@ -33,6 +33,21 @@ class ReactionTests(unittest.TestCase):
         self.assertIsNone(reactions.answer("Что бы ты ответил другу на вопрос о погоде?"))
 
 
+class SpeechTests(unittest.TestCase):
+    def test_event_kind_selects_the_reply(self):
+        sad = reactions.speech("Что скажешь другу, который провалил экзамен?")
+        rude = reactions.speech("Что скажешь соседу, который сверлит стену ночью?")
+        kind = reactions.speech("Что скажешь человеку, который помог тебе с курсовой?")
+        self.assertIn("пересдашь", sad)
+        self.assertIn("потише", rude)
+        self.assertIn("Спасибо", kind)
+        self.assertTrue(all("?" not in r and len(r) <= 300 for r in (sad, rude, kind)))
+
+    def test_unrelated_or_lateness_questions_are_left_to_others(self):
+        self.assertIsNone(reactions.speech("Что ты скажешь о погоде?"))
+        self.assertIsNone(reactions.speech("Друг опоздал на час. Что скажешь?"))
+
+
 class TravelTests(unittest.TestCase):
     def test_city_and_season_are_combined(self):
         astana = travel.answer("Что бы ты посоветовал человеку, который впервые приехал в Астану зимой?")
@@ -110,3 +125,30 @@ class GoalPlanTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FollowUpTests3(unittest.TestCase):
+    """Version 3.0 follow-ups and explanations."""
+
+    @classmethod
+    def setUpClass(cls):
+        from turing_bot.session import Session
+        cls.bot = Session()
+
+    def test_city_title_and_reason_follow_ups(self):
+        bot = self.bot
+        bot.reset()
+        bot.answer("Откуда ты родом?")
+        self.assertIn("Караганд", bot.answer("А там зимой холодно?"))
+        bot.answer("Какую последнюю книгу ты прочитал?")
+        self.assertIn("Пилате", bot.answer("О чём она?"))
+
+    def test_everyday_explanations(self):
+        from turing_bot.explanations import explain
+        self.assertIn("статическое", explain("Почему зимой бьёт током?"))
+        self.assertIn("лук", explain("Почему лук заставляет плакать?"))
+        self.assertIsNone(explain("Почему только мы спорим?"))
+
+    def test_no_question_mark_in_speech(self):
+        reply = reactions.speech("Как бы ты попросил преподавателя перенести дедлайн?")
+        self.assertNotIn("?", reply)
