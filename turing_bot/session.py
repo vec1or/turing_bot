@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
+from pathlib import Path
 import re
 import unicodedata
 import math
@@ -27,12 +28,19 @@ from .reasoning import Reasoning
 from .practical import Practical
 from .associations import Associations
 from .profile import Profile
+from .retrieval import Retrieval
 from . import goal_plan, reactions, travel
 from .rounds import Abstentions, clean, focal_question, requested_format, short_operation, standalone
 
 MAX_CHARS = 300
 MAX_INPUT = 4000
+RETRIEVAL_THRESHOLD = .72
+RETRIEVAL_STRONG = .78
+RETRIEVAL_MIN_DENSE = .5  # tuned on validation questions, see evaluation/RESULTS-3.0.md
 RECALL_SELF = re.compile(r"^(?:а |напомни[, ]+)?(?:что|какой вариант|какое слово) (?:же )?ты (?:только что |тогда |в итоге )?(?:выбрал|назвал|ответил|предпоч[её]л)а?[?!. ]*$",re.I)
+WHY = re.compile(r"(?:а |но |и |ну )?(?:почему|зачем|с чего бы|отчего|как так)(?: именно)?(?: так| это| же| ты так думаешь| ты так считаешь)?[?!. ]*",re.I)
+WHY_REPLIES = ("Ну, просто по опыту так.", "Сложно объяснить, просто так чувствую.", "Не знаю, мне так кажется.",
+               "Просто так сложилось.", "Ну а как иначе, по-моему, очевидно.")
 FOLLOW = re.compile(r"^(?:а |но )?(?:почему|зачем|как так|дальше|что потом|что дальше)(?: именно)?(?: так| туда| это| там)?[?!. ]*$",re.I)
 
 
@@ -82,15 +90,24 @@ class Session:
         self.practical = Practical()
         self.associations = Associations(directory)
         self.profile = Profile()
+        root = Path(directory) if directory is not None else Path(__file__).with_name("assets")
+        # The reply index is optional so that older asset folders keep working.
+        self.retrieval = Retrieval.load(directory) if (root / "retrieval" / "encoder.json").exists() else None
+        if self.retrieval is not None:
+            # Touch the whole index once at start-up, so that the first
+            # spectator's question is not slowed down by loading pages.
+            self.retrieval.propose("Привет, как дела?")
         self.abstentions = Abstentions()
         self.last_source = None
         self.last_route = None
+        self.last_retrieval = None
         self.turns = deque(maxlen=3)
 
     def reset(self):
         self.turns.clear()
         self.last_source = None
         self.last_route = None
+        self.last_retrieval = None
         self.persona.reset()
         self.abstentions.seen.clear()
 
@@ -138,19 +155,29 @@ class Session:
         yield "travel", travel.answer(question), None
         yield "profile", self.profile.answer(question), None
         yield "goal-plan", goal_plan.answer(question), None
-        yield "writing", self.writing.answer(question, self.imagination), None
-        yield "creative", self.imagination.answer(question), None
         yield "explanation", explain(question), None
-        yield "practical", self.practical.answer(question), None
         # Resolve a request for direct speech before planning a practical action.
         # A problem in the premise (e.g. lateness) need not be the requested task.
         social = self.social.propose(question)
         if social and re.search(r"\b(?:отве(?:ти|ча)|сказа|напиш)\w*",question,re.I):
             yield "social", social[0], None
-        yield "situation", self.situations.answer(question), None
         yield "persona", self.persona.answer(question), None
         if social:
             yield "social", social[0], None
+        if self.turns and self.last_route not in (None, "fallback") and WHY.fullmatch(question.strip()):
+            # The reason behind a retrieved reply is unknown; a person answers
+            # such a «А почему?» briefly instead of inventing an argument.
+            seen = {answer for _, answer in self.turns}
+            options = [r for r in WHY_REPLIES if r not in seen]
+            if options:
+                yield "follow-up", options[len(self.turns[-1][1]) % len(options)], None
+        # A real reply to a closely matching question sounds more human than
+        # the authored templates below, so a confident match goes first.
+        self.last_retrieval = None
+        yield "retrieval", self._retrieve(question, RETRIEVAL_STRONG), None
+        yield "writing", self.writing.answer(question, self.imagination), None
+        yield "creative", self.imagination.answer(question), None
+        yield "practical", self.practical.answer(question), None
         focus = focal_question(question)
         if not self.confidence.needs_evidence(question):
             if ASK.search(normal(question)):
@@ -169,17 +196,29 @@ class Session:
             passage = self.knowledge.propose(focus)
             if passage:
                 yield "reference", passage[0], "https://ru.wikipedia.org/?curid=" + str(passage[1])
-            if re.search(r"^(?:что (?:такое|значит)|кто так(?:ой|ая)|кто (?:изобр[её]л|написал)|где находится|когда (?:родил|основ))\b",focus.casefold()):
-                yield "fallback", self.abstentions.answer(question), None
-            phrase = self.planner.adjective(question)
-            if phrase:
-                yield "word-completion", phrase, None
-            yield "corpus-topic", self.associations.answer(question), None
-            context = question
-            if self.turns and FOLLOW.fullmatch(question):
-                context = "\n".join((*self.turns[-1], question))
-            yield "generator", self._generate(question, context), None
+        # The free generator, topic associations and word completion were
+        # removed from the chain in 3.0: blind checks found them mostly
+        # meaningless. Their code and weights remain for comparison.
+        yield "retrieval", self._retrieve(question, RETRIEVAL_THRESHOLD), None
+        # Authored situation plans match loosely; they are used only when no
+        # real reply is close enough.
+        yield "situation", self.situations.answer(question), None
         yield "fallback", self.abstentions.answer(question), None
+
+    def _retrieve(self, question, threshold):
+        if self.retrieval is None:
+            return None
+        # Spectators' questions are mostly independent; the previous reply is
+        # context only for a short follow-up such as «А почему?».
+        follow = len(question.split()) <= 5 and re.match(r"^(?:а|и|но|ну|так|почему|зачем|серьезно|серьёзно|правда)\b", question.strip(), re.I)
+        previous = self.turns[-1][1] if self.turns and follow else None
+        seen = {answer.casefold() for _, answer in self.turns}
+        if self.last_retrieval is None or self.last_retrieval[0] != question:
+            self.last_retrieval = (question, self.retrieval.propose(question, previous, seen))
+        found = self.last_retrieval[1]
+        if found and found[1] >= threshold and found[2]["dense"] >= RETRIEVAL_MIN_DENSE:
+            return found[0]
+        return None
 
     def _generate(self, question, context):
         options = self.word_model.candidates(context)

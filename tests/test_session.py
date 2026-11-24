@@ -25,19 +25,8 @@ class SessionTests(unittest.TestCase):
         bot = Session.__new__(Session)
         from collections import deque
         bot.turns = deque(maxlen=1)
-        bot.generator = Mock()
-        bot.generator.generate.return_value = "Давай сначала посмотрим."
-        bot.generator.score.return_value = [-1.]
-        bot.word_model = Mock()
-        bot.word_model.candidates.return_value = []
-        bot.word_model.cues.return_value = {}
-        bot.word_model.fluency.return_value = -2.
-        bot.cloze = Mock()
-        bot.cloze.complete.return_value = []
         bot.reader = Mock()
         bot.reader.propose.return_value = None
-        bot.stance = Mock()
-        bot.stance.propose.return_value = None
         bot.knowledge = Mock()
         bot.knowledge.propose.return_value = None
         bot.articles = Mock()
@@ -50,25 +39,23 @@ class SessionTests(unittest.TestCase):
         from turing_bot.rounds import Abstentions
         bot.abstentions = Abstentions()
         bot.last_route = None
-        for component in ("persona", "situations", "imagination", "writing", "reasoning", "practical", "associations", "profile"):
+        bot.last_retrieval = None
+        for component in ("persona", "situations", "imagination", "writing", "reasoning", "practical", "profile"):
             handler = Mock()
             handler.answer.return_value = None
             setattr(bot, component, handler)
-        bot.planner = Mock()
-        bot.planner.adjective.return_value = None
-        bot.planner.hints.return_value = []
-        bot.language = Mock()
-        bot.language.generate.return_value = "Давай сначала посмотрим."
         bot.confidence = Mock()
         bot.confidence.needs_evidence.return_value = False
-        bot.confidence.assess.return_value = .9
-        bot.confidence.threshold = .77
+        bot.retrieval = Mock()
+        bot.retrieval.propose.return_value = ("Давай сначала посмотрим.", .9, dict(dense=.7))
         bot.answer("С чего начать?")
+        self.assertIsNone(bot.retrieval.propose.call_args.args[1])
         bot.answer("А дальше?")
-        self.assertEqual(bot.generator.generate.call_args.args[0], "С чего начать?\nДавай сначала посмотрим.\nА дальше?")
+        # A short follow-up is read together with the previous reply.
+        self.assertEqual(bot.retrieval.propose.call_args.args[1], "Давай сначала посмотрим.")
         bot.reset()
-        bot.answer("Привет.")
-        self.assertEqual(bot.generator.generate.call_args.args[0], "Привет.")
+        bot.answer("А дальше?")
+        self.assertIsNone(bot.retrieval.propose.call_args.args[1])
 
     def test_word_statistics_are_repeatable_and_do_not_store_dialogues(self):
         rows = [{"context": "Куда идёт комета?", "response": "Комета летит очень далеко."},

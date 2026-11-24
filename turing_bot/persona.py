@@ -374,6 +374,6 @@ class Persona:
                     return self._say(taste.reason if norm.startswith(("почему","отчего")) else taste.habit,taste.reason,term)
         if re.search(r"\b(?:хобби|увлечени\w*|досуг|выходн\w*|свободн\w* время|после (?:пар|учебы)|отдыхаешь|увлекаешься|(?:нравится|любишь|предпочитаешь) делать)\b",norm):
             return self._say(WALK.habit,WALK.reason,"прогулки")
-        if re.search(r"\b(?:пары|учеба|учебе|учишься|студент|занимаешься)\b",norm):
+        if re.fullmatch(r"(?:а |ну )?(?:чем (?:ты )?занимаешься|ты учишься|учишься|ты студент)",norm):
             return self._say("Учусь. На парах записываю главное, а вечером разбираю то, что осталось непонятным.",keyword="учусь")
         return None

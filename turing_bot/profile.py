@@ -99,6 +99,26 @@ class Profile:
         self.clock = clock
         self.facts = tuple((re.compile(r"\b(?:" + topic + r")"), text) for topic, text in FACTS)
 
+    @staticmethod
+    def _creative(norm):
+        if not re.search(r"\b(?:придумай|сочини|напиши|расскажи|скажи|пошути|давай|можешь)\b|\bпошути", norm):
+            return None
+        if re.search(r"\bтост\w*", norm):
+            return "Ну, за тех, кто сейчас не спит и учится: пусть чай будет крепким, а преподаватели добрыми."
+        if re.search(r"\bрифм\w*", norm):
+            return "С рифмами у меня беда. «Сессия — депрессия», но это банально, сам знаю."
+        if re.search(r"\b(?:стих\w*|стишок)\b", norm):
+            return "Сижу на паре, думаю о сне, а лектор что-то пишет на стене. Дальше не придумал, честно."
+        if re.search(r"\b(?:шутк\w*|анекдот\w*|пошути\w*|сарказм\w*|прикол\w*)", norm):
+            if re.search(r"\bпонедельник\w*", norm):
+                return "Понедельник — это когда ты в восемь утра уже устал от недели, которая ещё не началась."
+            if re.search(r"\b(?:дедлайн\w*|сесси\w*|студент\w*|экзамен\w*|пар[аеуы])\b", norm):
+                return "Студент до дедлайна: времени ещё вагон. Студент за час до дедлайна: а что, так можно было, сдавать раньше."
+            if re.search(r"\b(?:программист\w*|компьютер\w*|ии|робот\w*)\b", norm):
+                return "Мой ноутбук обновляется ровно тогда, когда мне надо срочно что-то сдать. Это уже не шутка, это система."
+            return None
+        return None
+
     def answer(self, question):
         norm = _norm(question)
         if not norm or len(norm) > 200:
@@ -121,6 +141,9 @@ class Profile:
             return "Сначала помог бы родителям, потом съездил бы в Японию. Остальное отложил бы и сам удивился своей скучности."
         if AI.search(norm):
             return "Штука полезная, но я бы ей контрольную не доверил. Ошибается очень уверенно."
+        creative = self._creative(norm)
+        if creative:
+            return creative
         if JOKE.search(norm):
             return "С анекдотами у меня плохо, всегда забываю концовку. Могу только правду жизни: на первой паре я присутствую, но не полностью."
         # A biographical fact is about the interlocutor, not about people in general.

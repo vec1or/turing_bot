@@ -1,5 +1,5 @@
 """Russian offline conversation generator."""
-__version__ = "2.2.0"
+__version__ = "3.0.0"
 
 
 def __getattr__(name):
