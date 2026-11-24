@@ -29,7 +29,7 @@ from .practical import Practical
 from .associations import Associations
 from .profile import Profile
 from .retrieval import Retrieval
-from . import goal_plan, reactions, travel
+from . import goal_plan, reactions, tips, travel
 from .rounds import Abstentions, clean, focal_question, requested_format, short_operation, standalone
 
 MAX_CHARS = 300
@@ -187,6 +187,7 @@ class Session:
             options = [r for r in WHY_REPLIES if r not in seen]
             if options:
                 yield "follow-up", options[len(self.turns[-1][1]) % len(options)], None
+        yield "tips", tips.answer(question), None
         # A real reply to a closely matching question sounds more human than
         # the authored templates below, so a confident match goes first.
         self.last_retrieval = None
@@ -231,6 +232,10 @@ class Session:
         if len(q) > 120:
             return None
         title = next((t for t in TITLES if t in previous), None)
+        if re.fullmatch(r"(?:а |и )?с кем[?!. ]*", q):
+            return "С соседом по комнате, мы с ним ещё со школы дружим."
+        if self.last_route == "reaction" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
+            return "Тогда поговорил бы ещё раз, уже серьёзнее. Ссориться не люблю, но и терпеть бесконечно не стану."
         if title and re.search(r"\b(?:о чем|про что|что за|расскажи)\b", q) and re.search(r"\b(?:она|он|оно|это|книга|книжка|фильм|кино)\b|^(?:а |и )?(?:о чем|про что)", q):
             return TITLES[title][0]
         if title and re.search(r"\b(?:понравил\w*|как тебе|как (?:он|она|оно) тебе|стоит (?:ли )?(?:смотреть|читать))\b", q):
