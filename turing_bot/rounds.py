@@ -66,8 +66,9 @@ def rough(value):
     value = abs(float(value))
     for size, word in ((1e9, "миллиарда"), (1e6, "миллиона"), (1e3, "тысяч")):
         if value >= size:
-            shown = f"{value / size:.1f}".replace(".0", "").replace(".", ",")
-            return f"Без калькулятора точно не скажу. Где-то около {shown} {word}."
+            scaled = value / size
+            shown = str(round(scaled)) if scaled >= 10 else f"{scaled:.1f}".replace(".0", "").replace(".", ",")
+            return f"Без калькулятора точно не скажу. Где-то около {shown} {word}, наверное."
     return f"Где-то около {round(value)}."
 
 
