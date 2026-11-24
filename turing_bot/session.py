@@ -240,7 +240,8 @@ class Session:
             yield "reaction", reactions.speech(question.rstrip(" ?") + ". Что скажешь?"), None
         yield "reaction", reactions.answer(question), None
         yield "reaction", reactions.speech(question), None
-        yield "travel", travel.answer(question), None
+        if not re.search(r"денег (?:ноль|нет)|без денег|бесплатн|на мели", question, re.I):
+            yield "travel", travel.answer(question), None
         yield "profile", self.profile.answer(question), None
         yield "goal-plan", goal_plan.answer(question), None
         yield "explanation", explain(question), None
@@ -342,6 +343,14 @@ class Session:
             return "Как-то перед контрольной всей группе объяснял пределы на перемене, вот и прилипло. Я не против."
         if "чавка" in earlier and re.search(r"\b(?:сам|ты)\b.{0,20}чавка", q):
             return "Может, и чавкал, со стороны себя не слышно. Но если что, мне бы сказали, у нас в группе с этим не стесняются."
+        if re.search(r"\b(?:чего|почему|че|чё|что) (?:так|ты так) поздно", q):
+            return "Да сериал затянул, а потом ещё в телефоне залип. Классика."
+        if re.search(r"брос", previous + " " + earlier) and re.search(r"отговар\w*|отговорил\w*", q):
+            return "Попробовал бы, да. Но если он всё взвесил и правда знает, чем будет заниматься, — это его жизнь, я бы поддержал."
+        if re.search(r"прокрастин|отклады", earlier) and re.search(r"\b(?:у тебя|сам|самого)\b", q):
+            return "Через раз, честно. Таймер помогает, но иногда я и его откладываю."
+        if "Барсик" in previous and re.search(r"^(?:а |и |ну )?почему", q):
+            return "Они спокойные и сами по себе. С собакой гулять надо три раза в день, а я себя-то еле из дома вытаскиваю."
         if re.search(r"подар", previous + " " + earlier) and re.search(r"ничего не (?:надо|нужно)", q):
             return "Все так говорят. Значит, нужно что-то небольшое, но от себя: открытка или её любимые сладости."
         if re.search(r"друз|дружить", previous + " " + earlier) and re.search(r"\bсмог\w* (?:бы )?(?:\w+ )?дружить|\bты бы (?:сам )?(?:смог|стал) дружить", q):
