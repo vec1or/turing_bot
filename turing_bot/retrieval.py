@@ -131,6 +131,8 @@ def persona_safe(reply):
     last = re.findall(r"[а-яё]+", reply.casefold())
     if last and last[-1] in {"почти", "очень", "самый", "самая", "такой", "такая", "этот", "эти", "мой", "моя", "свой", "его", "её", "их", "уже", "еще", "ещё", "тоже", "если", "когда", "чтобы", "потому", "который"}:
         return False
+    if re.search(r"€|\$|\bевро\b|\bдоллар\w*|\bгермани\w*|\bевроп\w*|\d+\s*(?:р|руб\w*)\b|\bрубл\w*|\bтрамва\w*|\bметро\b|\bэлектричк\w*", reply, re.I):
+        return False
     # Places, relatives and age belong to the fixed biography in profile.py.
     if re.search(r"^(?:я )?из [а-яё]+|\bобласт\w*|\b(?:есть|у меня) (?:\w+ )?(?:брат\w*|сестр\w*|дети|ребен\w*|ребён\w*)|\bлетн(?:ий|яя)\b|\bмне (?:уже )?(?:за|под) ", reply, re.I):
         return False
