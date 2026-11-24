@@ -135,7 +135,7 @@ def persona_safe(reply):
         return False
     if "©" in reply or re.search(r"\b(?:профил\w* кбс|скидк\w*|акци\w*|звоните|заказывайте)\b", reply, re.I):
         return False
-    if re.search(r"\bне печата\w*|\bне человек\b|\bя (?:программа|машина|алгоритм)\b|\bросси\w*|\bроссиян\w*", reply, re.I):
+    if re.search(r"\bне печата\w*|\bне человек\b|\bя (?:программа|машина|алгоритм)\b|\bросси\w*|слышал,? как храп|\bроссиян\w*", reply, re.I):
         return False
     if re.search(r"\bидеальн(?:а|ая)\b|\bу меня нет ошибок", reply, re.I):
         return False
