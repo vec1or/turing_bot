@@ -137,7 +137,7 @@ def persona_safe(reply):
         return False
     if re.search(r"\bне печата\w*|\bне человек\b|\bя (?:программа|машина|алгоритм)\b|\bв росси\w*|\bроссиян\w*", reply, re.I):
         return False
-    if re.search(r"\bдет(?:ей|и|ям|ьми)\b|\bвнук\w*|\bпенси\w*", reply, re.I):
+    if re.search(r"\bучительниц\w*|\bдет(?:ей|и|ям|ьми)\b|\bвнук\w*|\bпенси\w*", reply, re.I):
         return False
     if re.search(r"через двор|\bродител\w* .{0,20}живут|\bживут (?:рядом|недалеко|через)", reply, re.I):
         return False
