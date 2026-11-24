@@ -233,7 +233,7 @@ class Session:
         title = next((t for t in TITLES if t in previous), None)
         if title and re.search(r"\b(?:о чем|про что|что за|расскажи)\b", q) and re.search(r"\b(?:она|он|оно|это|книга|книжка|фильм|кино)\b|^(?:а |и )?(?:о чем|про что)", q):
             return TITLES[title][0]
-        if title and re.search(r"\b(?:понравил\w*|как тебе|стоит (?:ли )?(?:смотреть|читать))\b", q):
+        if title and re.search(r"\b(?:понравил\w*|как тебе|как (?:он|она|оно) тебе|стоит (?:ли )?(?:смотреть|читать))\b", q):
             return TITLES[title][1]
         if re.search(r"\bтам\b|\bв нем\b|\bв нём\b", q):
             named = [(m.start(), data) for data in travel.CITIES.values()
@@ -241,6 +241,8 @@ class Session:
             if named:
                 # The first city named is the one the speaker is talking about.
                 data = min(named, key=lambda item: item[0])[1]
+                if re.search(r"\b(?:интересн\w*|посмотреть|сходить|посетить|красив\w*|делать)\b", q):
+                    return data["place"]
                 for season, expr in travel.SEASONS:
                     if expr.search(q):
                         return data[season]

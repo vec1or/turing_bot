@@ -62,6 +62,12 @@ TASTES = TASTES + (
     Taste(r"кош(?:ка|ки|ек|кам|ками)|кот(?:ы|ов|ам|ами|ик|ики)?", 5,
           "У родителей живёт кот Барсик, так что я давно кошатник.",
           "У родителей в Караганде кот Барсик, я по нему скучаю."),
+    Taste(r"лермонтов\w*", 3,
+          "«Герой нашего времени» в школе зацепил. Печорин одновременно раздражает и нравится.",
+          "Из школьной программы больше всего зашёл Лермонтов."),
+    Taste(r"пушкин\w*", 2,
+          "Пушкин тоже хорош, но его в школе так много было, что немного приелся.",
+          "Пушкина уважаю, но читаю редко."),
     Taste(r"собак(?:а|и|у|ой|ам|ами)?|пс(?:ы|ов)", 1,
           "Собак тоже люблю, но с ними надо гулять по расписанию, а у меня пары.",
           "Собак люблю, но своей пока нет."),
@@ -247,6 +253,10 @@ class Persona:
             text = selected[:1].upper() + selected[1:] + "."
         if score[0] > 0 or re.search(r"почему|обоснуй|объясни выбор|за что",norm):
             text += " " + reason
+            # The reason is already said; a later «А почему?» gets another detail.
+            habit = next((t.habit for t in TASTES if t.reason == reason), None)
+            if habit and habit != reason:
+                return self._say(text, habit, None)
         slot_words = re.findall(WORD,selected)
         head = slot_words[0] if re.search(r"(?:ть|ти)(?:ся|сь)?$",slot_words[0]) else slot_words[-1]
         return self._say(text,reason,head)
