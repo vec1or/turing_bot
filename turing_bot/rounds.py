@@ -80,7 +80,7 @@ def short_operation(text):
                 ctx.prec = 12
                 value = ARITHMETIC[m[2]](Decimal(m[1].replace(",", ".")), Decimal(m[3].replace(",", ".")))
             a, b = abs(Decimal(m[1].replace(",", "."))), abs(Decimal(m[3].replace(",", ".")))
-            if m[2] in ("*", "умножить на") and a >= 100 and b >= 100:
+            if m[2] in ("*", "умножить на") and a * b >= 10000:
                 return rough(value)
             answer = format(value,"f")
             if "." in answer:

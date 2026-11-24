@@ -41,6 +41,7 @@ class SessionTests(unittest.TestCase):
         bot.last_route = None
         bot.last_retrieval = None
         bot.first_question = None
+        bot.first_answer = None
         for component in ("persona", "situations", "imagination", "writing", "reasoning", "practical", "profile"):
             handler = Mock()
             handler.answer.return_value = None

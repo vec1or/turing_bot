@@ -126,6 +126,10 @@ STYLE = re.compile(r"[a-z]|:\)|:\(|:d|\)\)|\(\(|\b(?:вы|вас|вам|ваш\w
 def persona_safe(reply):
     if STYLE.search(reply):
         return False
+    if reply.count("(") != reply.count(")") and not reply.rstrip().endswith(")"):
+        return False
+    if re.search(r"[а-яё][.,!][а-яё]|\b(?:класс\w*|колледж\w*|техникум\w*|училищ\w*|учусь на|курс по специальност\w*|в школе учусь)\b", reply, re.I):
+        return False
     if FEM_ADJ.search(reply) or re.search(r"\b(?:рост|вес)\s+\d+", reply, re.I):
         return False
     if FEMININE.search(reply) or BIOGRAPHY.search(reply) or REJECT.search(reply) or "?" in reply:

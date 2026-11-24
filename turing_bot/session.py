@@ -46,7 +46,7 @@ TITLES = {
                      "Да, очень. Пересматривал раза три, и каждый раз в конце сижу молча."),
 }
 EXPLICIT = re.compile(r"\b(?:объясни\w*|расскажи (?:про|о|об)|что такое|что значит|кто так(?:ой|ая)|как работает|как устроен\w*)\b", re.I)
-WHY = re.compile(r"(?:а |но |и |ну )?(?:почему|зачем|с чего бы|отчего|как так)(?: именно)?(?: так| это| же| его| её| ее| их| он| она| ты так думаешь| ты так считаешь)?[?!. ]*",re.I)
+WHY = re.compile(r"(?:а |но |и |ну )?(?:почему|зачем|с чего бы|отчего|как так)(?: именно)?(?: так| это| же| его| её| ее| их| им| ими| ей| он| она| они| ты так думаешь| ты так считаешь)?[?!. ]*",re.I)
 ARTISTS = ("Скриптонит", "Булгаков", "Нолан")
 WHY_REPLIES = ("Ну, просто по опыту так.", "Сложно объяснить, просто так чувствую.", "Не знаю, мне так кажется.",
                "Просто так сложилось.", "Ну а как иначе, по-моему, очевидно.")
@@ -111,6 +111,7 @@ class Session:
         self.last_route = None
         self.last_retrieval = None
         self.first_question = None
+        self.first_answer = None
         self.turns = deque(maxlen=3)
 
     def reset(self):
@@ -119,6 +120,7 @@ class Session:
         self.last_route = None
         self.last_retrieval = None
         self.first_question = None
+        self.first_answer = None
         self.persona.reset()
         self.abstentions.seen.clear()
 
@@ -144,12 +146,15 @@ class Session:
                 self.turns.append((question, reply))
                 if self.first_question is None:
                     self.first_question = question
+                    self.first_answer = reply
                 return reply
 
     def _candidates(self, question):
         if self.turns and self.last_route != "fallback" and RECALL_SELF.fullmatch(question):
             previous = self.turns[-1][1]
             yield "recall", previous, None
+        if self.turns and self.first_answer and re.search(r"\bперв\w*", question, re.I) and re.search(r"\b(?:ответил|сказал|отвечал)\w*", question, re.I):
+            yield "recall", f"Сказал: «{self.first_answer.rstrip('.')}». Помню, помню."[:300], None
         if self.turns and REPEAT.search(question):
             previous = self.turns[-1][1]
             if len(previous) > 120:
@@ -180,6 +185,7 @@ class Session:
         social = self.social.propose(question)
         if social and re.search(r"\b(?:отве(?:ти|ча)|сказа|напиш)\w*",question,re.I):
             yield "social", social[0], None
+        yield "tips", tips.answer(question), None
         yield "persona", self.persona.answer(question), None
         if social:
             yield "social", social[0], None
@@ -192,7 +198,6 @@ class Session:
             options = [r for r in WHY_REPLIES if r not in seen]
             if options:
                 yield "follow-up", options[len(self.turns[-1][1]) % len(options)], None
-        yield "tips", tips.answer(question), None
         # A real reply to a closely matching question sounds more human than
         # the authored templates below, so a confident match goes first.
         self.last_retrieval = None
