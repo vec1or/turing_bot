@@ -303,9 +303,10 @@ class Session:
         if not parts:
             return None
         answers = [self._precise(p) for p in parts]
-        if not all(answers) or answers[0] == answers[1]:
+        if not all(answers):
             return None
-        reply = display_text(answers[0].rstrip() + " " + answers[1])
+        joined = answers[0] if answers[0] == answers[1] else answers[0].rstrip() + " " + answers[1]
+        reply = display_text(joined)
         if len(reply) > MAX_CHARS or not standalone(reply):
             return None
         self.last_route, self.last_source = "two-parts", None
@@ -370,6 +371,8 @@ class Session:
             return "«Положение», наверное. Старое, но до сих пор заходит."
         if re.fullmatch(r"(?:а |и )?с кем[?!. ]*", q):
             return "С соседом по комнате, мы с ним ещё со школы дружим."
+        if re.search(r"\b(?:денег (?:нет|совсем нет)|нет денег)\b", q) and re.search(r"\b(?:деньги|верни|долг)\b", previous.casefold()):
+            return "Тогда пусть отдаёт частями, хоть по чуть-чуть. Мне не горит, главное, чтобы не пропал."
         if self.last_route == "reaction" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
             if re.search(r"\b(?:потише|неприятно|договоримся|про деньги|очередь|спрашивай)\b", previous.casefold()):
                 return "Тогда поговорил бы ещё раз, уже серьёзнее. Ссориться не люблю, но и терпеть бесконечно не стану."
