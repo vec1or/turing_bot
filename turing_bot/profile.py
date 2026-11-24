@@ -289,7 +289,8 @@ class Profile:
             return "Да не притворяюсь я. Человек, обычный студент, просто отвечаю как есть."
         if re.search(r"\bкак (?:ты )?(?:поймешь|понять|отличить),? (?:что|кто) (?:ты |я )?(?:бот|человек)", norm):
             return "Бот бы ответил гладко и без ошибок. А я вот третий раз переписываю это сообщение."
-        if bot_word and re.search(r"\b(?:ты|тебя|тебе|вы|ты-то)\b", norm) and not re.search(r"\b(?:нравится|любишь|думаешь о|как относишься|что думаешь|умеешь|сделать|создать|написать)\b", norm):
+        short_accusation = bot_word and len(norm.split()) <= 6 and not re.search(r"\b(?:что такое|как работает|как сделать|создать|написать|сделать|этот|эти|чат-бот\w*)\b", norm)
+        if bot_word and (short_accusation or re.search(r"\b(?:ты|тебя|тебе|вы|ты-то)\b", norm)) and not re.search(r"\b(?:нравится|любишь|думаешь о|как относишься|что думаешь|умеешь|сделать|создать|написать)\b", norm):
             # The first four are for a first accusation; the rest follow repeated ones.
             return DENIALS[sum(map(ord, norm)) % 4]
         return None
