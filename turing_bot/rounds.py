@@ -61,6 +61,16 @@ EXPR = re.compile(r"(?:сколько (?:же )?(?:будет|получится
 QUOTED_WORD = r'[«„“"\']([а-яё-]{1,50})[»“”"\']'
 
 
+def rough(value):
+    """A person estimates a large product instead of reciting every digit."""
+    value = abs(float(value))
+    for size, word in ((1e9, "миллиарда"), (1e6, "миллиона"), (1e3, "тысяч")):
+        if value >= size:
+            shown = f"{value / size:.1f}".replace(".0", "").replace(".", ",")
+            return f"Без калькулятора точно не скажу. Где-то около {shown} {word}."
+    return f"Где-то около {round(value)}."
+
+
 def short_operation(text):
     q = text.casefold().replace("ё", "е").replace("×", "*").replace("÷", "/").replace("−", "-")
     m = EXPR.fullmatch(q)
@@ -69,6 +79,9 @@ def short_operation(text):
             with localcontext() as ctx:
                 ctx.prec = 12
                 value = ARITHMETIC[m[2]](Decimal(m[1].replace(",", ".")), Decimal(m[3].replace(",", ".")))
+            a, b = abs(Decimal(m[1].replace(",", "."))), abs(Decimal(m[3].replace(",", ".")))
+            if m[2] in ("*", "умножить на") and a >= 100 and b >= 100:
+                return rough(value)
             answer = format(value,"f")
             if "." in answer:
                 answer = answer.rstrip("0").rstrip(".")
