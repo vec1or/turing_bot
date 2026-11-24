@@ -145,7 +145,7 @@ def answer(question):
     if len(norm) > 300 or not ASK.search(norm):
         return None
     # Questions about other people's feelings or what to *say* belong elsewhere.
-    if re.search(r"\b(?:что (?:бы )?(?:ты )?(?:скажешь|ответишь)|почему)\b", norm):
+    if re.search(r"\bчто (?:бы )?(?:ты )?(?:скажешь|ответишь)\b|^(?:а |и |ну )?почему\b", norm):
         return None
     item = re.search(r"накопить на (айфон|машину|ноутбук|ноут|телефон|квартиру|поездку|велосипед|приставку)", norm)
     if item:
