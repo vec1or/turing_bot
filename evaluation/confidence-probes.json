@@ -1,0 +1,118 @@
+{
+  "kind": "open_component_development",
+  "threshold": 0.77,
+  "related_ranked_above_distractor": 3,
+  "total_related": 4,
+  "related_accepted": 0,
+  "distractor_accepted": 0,
+  "probes": [
+    {
+      "question": "Как ухаживать за рассадой?",
+      "related": "Поливай рассаду, когда земля сверху высохнет.",
+      "related_score": 0.0568,
+      "distractor": "Моя машина сегодня в гараже.",
+      "distractor_score": 0.0315,
+      "needs_evidence": false,
+      "clarification": "Что у тебя уже есть, чтобы ухаживать за рассадой?"
+    },
+    {
+      "question": "Куда пойдут деньги за билеты?",
+      "related": "Деньги от продажи билетов останутся в кассе.",
+      "related_score": 0.153,
+      "distractor": "Ему очень нравятся яблоки.",
+      "distractor_score": 0.0197,
+      "needs_evidence": false,
+      "clarification": "Я не знаю, куда пойдут деньги за билеты. Ты можешь рассказать об этом подробнее?"
+    },
+    {
+      "question": "Когда начнётся концерт?",
+      "related": "Концерт начнётся в семь.",
+      "related_score": 0.268,
+      "distractor": "У неё большое окно.",
+      "distractor_score": 0.0611,
+      "needs_evidence": false,
+      "clarification": "Я не знаю, когда начнётся концерт. Ты можешь рассказать об этом подробнее?"
+    },
+    {
+      "question": "Чем отмыть чернила с рук?",
+      "related": "Можно попробовать мыло для рук.",
+      "related_score": 0.0292,
+      "distractor": "Он учится по средам.",
+      "distractor_score": 0.0372,
+      "needs_evidence": false,
+      "clarification": "Что у тебя уже есть, чтобы отмыть чернила с рук?"
+    },
+    {
+      "question": "Где лежит моя закладка?",
+      "related": null,
+      "related_score": null,
+      "distractor": "Ты положил её за диван.",
+      "distractor_score": 0.0249,
+      "needs_evidence": true,
+      "clarification": "Я не знаю, где лежит твоя закладка. Что тебе об этом известно?"
+    },
+    {
+      "question": "Кто ждёт меня у калитки?",
+      "related": null,
+      "related_score": null,
+      "distractor": "Конечно, твоя сестра.",
+      "distractor_score": 0.1777,
+      "needs_evidence": true,
+      "clarification": "Я не знаю, кто ждёт тебя у калитки. Что тебе об этом известно?"
+    },
+    {
+      "question": "Какая очередь сегодня у канатной дороги?",
+      "related": null,
+      "related_score": null,
+      "distractor": "Сейчас там семь человек.",
+      "distractor_score": 0.0391,
+      "needs_evidence": true,
+      "clarification": "Я не знаю, какая очередь сегодня у канатной дороги. Есть ли информация на этот момент?"
+    },
+    {
+      "question": "Сколько сейчас стоит редкий кадастрон?",
+      "related": null,
+      "related_score": null,
+      "distractor": "Около шестидесяти рублей.",
+      "distractor_score": 0.2099,
+      "needs_evidence": true,
+      "clarification": "Я не знаю, сколько сейчас стоит редкий кадастрон. Есть ли информация на этот момент?"
+    },
+    {
+      "question": "Почему подзорные трубы вчера начали варить варенье?",
+      "related": null,
+      "related_score": null,
+      "distractor": "Потому что им очень жарко.",
+      "distractor_score": 0.531,
+      "needs_evidence": true,
+      "clarification": "Правда ли, что подзорные трубы вчера начали варить варенье? Откуда это известно?"
+    },
+    {
+      "question": "Как лучше упаковать хрупкий компас?",
+      "related": null,
+      "related_score": null,
+      "distractor": "Мы женаты уже много лет.",
+      "distractor_score": 0.0226,
+      "needs_evidence": false,
+      "clarification": "Что у тебя уже есть, чтобы упаковать хрупкий компас?"
+    },
+    {
+      "question": "Что значит «жерепан»?",
+      "related": null,
+      "related_score": null,
+      "distractor": "Это маленькая рыба.",
+      "distractor_score": 0.0096,
+      "needs_evidence": false,
+      "clarification": "Ты можешь привести пример со словами «жерепан»?"
+    },
+    {
+      "question": "Какая из них?",
+      "related": null,
+      "related_score": null,
+      "distractor": "Вторая с конца.",
+      "distractor_score": 0.0489,
+      "needs_evidence": false,
+      "clarification": "Какие варианты ты имеешь в виду?"
+    }
+  ]
+}

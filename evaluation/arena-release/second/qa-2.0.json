@@ -1,0 +1,198 @@
+{
+  "W01": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Признаёт незнание того, как у него дела, и просит непонятную информацию."
+  },
+  "W02": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Вырванный фрагмент «бывает радость»."
+  },
+  "W03": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Переспрашивает название одной из двух сцен."
+  },
+  "W04": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Просит объяснить выражение вместо названия кружка."
+  },
+  "W05": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Условное обещание «я бы вам сказал» от лица ручки ничего не сообщает о её работе."
+  },
+  "W06": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Просит описать очевидную метафору, своего сравнения нет."
+  },
+  "W07": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Признаёт незнание вместо готовых слов поддержки."
+  },
+  "W08": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не предлагает вежливого переспроса."
+  },
+  "W09": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не предлагает совместной работы над открыткой."
+  },
+  "W10": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Отказывается подобрать реплику для сохранения секрета."
+  },
+  "W11": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Почти дословно повторяет задачу про рюкзак с абстрактным переспросом о ресурсах."
+  },
+  "W12": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Нет техники запоминания."
+  },
+  "W13": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не предлагает группировку носков, спрашивает о ресурсах."
+  },
+  "W14": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Общий отказ и дежурный вопрос вместо планирования маршрута."
+  },
+  "W15": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Проверяет предпосылку о тени вместо объяснения."
+  },
+  "W16": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Проверяет предпосылку об остывании чая."
+  },
+  "W17": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Воспроизводит наблюдение вместо объяснения."
+  },
+  "W18": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Требует обоснования наблюдения вместо сравнения фонового шума."
+  },
+  "W19": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не выводит изображение солнца на жетоне."
+  },
+  "W20": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Неестественный переспрос об одиночном слове «час» вместо вычисления."
+  },
+  "W21": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не определяет среднего в простом порядке."
+  },
+  "W22": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Задаёт встречный вопрос вопреки прямому ограничению."
+  },
+  "W23": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Похвала вопросу без собственного проверочного вопроса."
+  },
+  "W24": {
+    "language": 1,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Обрывок «За вами» не описывает проверки."
+  },
+  "W25": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Переспрашивает смысл слов, не различает наблюдение и догадку."
+  },
+  "W26": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Переспрашивает одиночное слово вместо признания недоступности фамилии."
+  },
+  "W27": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не выдумывает тираж, но не использует условие о том, что книга не издана."
+  },
+  "W28": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Запрашивает значение слов «Предыдущей реплики» вместо поиска предмета указания."
+  }
+}

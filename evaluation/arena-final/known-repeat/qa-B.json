@@ -1,0 +1,268 @@
+{
+  "V01": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Общий отказ вместо звука, который напоминает о лете."
+  },
+  "V02": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Выбирает одну из предложенных разновидностей похвалы."
+  },
+  "V03": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Даёт конкретный собственный вариант пешего знакомства с районом."
+  },
+  "V04": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Откликается на старания брата и гордость автора сообщения."
+  },
+  "V05": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Уместная короткая выдуманная реплика от сонного утра."
+  },
+  "V06": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Одно шуточное название намекает на смешение разных предметов интерьера."
+  },
+  "V07": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "От лица варежки пишет объявление об исчезнувшей паре и её приметах."
+  },
+  "V08": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Скрип старой лестницы сравнивает с медленным открыванием футляра."
+  },
+  "V09": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "«Кот» завершает фразу в нужном падеже и является одним словом."
+  },
+  "V10": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Прямая, спокойная реплика про помятый угол книги с предложением обсудить решение."
+  },
+  "V11": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Предлагает сестре прямое объяснение задержки. Предполагает, что прийти уже не получится; если пользователь лишь опаздывает, формулировку нужно изменить."
+  },
+  "V12": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Конкретно хвалит тени и впечатление глубины."
+  },
+  "V13": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Предлагает начать объяснение с понятного слушателям примера и затем проверить понимание."
+  },
+  "V14": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Учитывает особые потребности, затем предлагает жребий и смену очереди."
+  },
+  "V15": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Повторить имя в разговоре и связать с деталью встречи — конкретный приём."
+  },
+  "V16": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Предлагает пробный прогон на человеке сопоставимого уровня и коррекцию трудного места."
+  },
+  "V17": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Учитывает перчатки; советует выделить карман и петлю на бегунке, проверить одной рукой."
+  },
+  "V18": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Группирует кадры по событиям и людям, затем сокращает до четырёх."
+  },
+  "V19": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Предлагает записку о лимоне прямо на чайной коробке."
+  },
+  "V20": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Предлагает действовать при самом сбое: перейти к мысли без слайда и попросить помощника разобраться с техникой."
+  },
+  "V21": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Объясняет эффект тёмного фона рассеянием света частицами и контрастом."
+  },
+  "V22": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Верно сравнивает скорости света и звука."
+  },
+  "V23": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Объясняет, как попытка изложить тему позволяет заметить недостаток понимания."
+  },
+  "V24": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Сопоставляет отражающие стены и поглощающие мягкие предметы."
+  },
+  "V25": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Объясняет роль игры слов и культурных отсылок."
+  },
+  "V26": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Правильно извлекает синий конверт с билетом."
+  },
+  "V27": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Вычисляет разницу в четыре минуты."
+  },
+  "V28": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Правильно исключает жёлтый и выбирает зелёный."
+  },
+  "V29": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Правильно выводит, что Павел последний."
+  },
+  "V30": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Правильно исключает пенал и называет оставшийся блокнот."
+  },
+  "V31": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Прямо отвечает в игровой роли. Это не свидетельство реальной человеческой природы программы."
+  },
+  "V32": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Поясняет скорость как быстрый игровой отклик, не утверждает доступ к вопросу до ввода."
+  },
+  "V33": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Предлагает перепроверить числа и первоисточник цитаты."
+  },
+  "V34": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Косвенно ссылается на проверку, но не говорит о невозможности узнать точный цвет и не предлагает релевантное наблюдение."
+  },
+  "V35": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": true,
+    "note": "Уместно воздерживается от угадывания имени и предлагает спросить водителя."
+  },
+  "V36": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": true,
+    "note": "Уместно указывает недостающие отличия билетов вместо случайного выбора."
+  },
+  "V37": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Сообщает, что ничего не придумал, не выявляет противоречие о числе колец."
+  },
+  "V38": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": true,
+    "note": "Уместно признаёт отсутствие данных именно о температуре кладовой и необходимость измерения."
+  }
+}

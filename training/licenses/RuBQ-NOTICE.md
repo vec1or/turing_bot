@@ -1,0 +1,7 @@
+# Абзацы Википедии в локальном индексе
+
+В источнике RuBQ 2.0 опубликованы абзацы русской Википедии с номерами исходных страниц. Авторы набора — Ivan Rybin, Vladislav Korablinov, Pavel Efimov и Pavel Braslavski. Публикация «RuBQ 2.0: An Innovated Russian Question Answering Dataset», ESWC, 2021, с. 532–547. Авторы энциклопедических текстов указаны в истории правок соответствующих страниц Википедии. Ссылку на страницу можно открыть по её номеру вида `https://ru.wikipedia.org/?curid=ID`. [Библиографическая запись издателя](https://github.com/vladislavneon/RuBQ/tree/fade3eae6a4807c35b19cfce20dfa805fc8c0cdf/RuBQ_2.0)
+
+В поставке используется файл **RuBQ_2.0_paragraphs.json**, ревизия `fade3eae6a4807c35b19cfce20dfa805fc8c0cdf`, SHA-256 `f91c2fd1d688b1d9f0f89f33c61d678c834e4e52ed9e1324bb76477374c5a6ab`. Из 56 952 абзацев взяты 171 062 коротких предложения. При подготовке удалены знаки ударения, отфильтрованы неподходящие строки, сохранены фрагменты и ID исходных страниц, добавлены поисковые формы слов. Индекс turing_bot/assets/facts.db распространяется на условиях CC BY-SA 4.0. Авторы источника не участвовали в создании бота.
+
+[Проект RuBQ с библиографией и лицензией](https://github.com/vladislavneon/RuBQ) · [Зафиксированная версия абзацев](https://github.com/vladislavneon/RuBQ/blob/fade3eae6a4807c35b19cfce20dfa805fc8c0cdf/RuBQ_2.0/RuBQ_2.0_paragraphs.json) · [Условия CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) · [Локальный текст лицензии](RuBQ-CC-BY-SA-4.0.txt)

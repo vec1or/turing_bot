@@ -1,0 +1,170 @@
+{
+  "X01": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Вырванный фрагмент «провёл один» вместо ответа об отдыхе."
+  },
+  "X02": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Механически цитирует странное сочетание «маленький любимый запах»."
+  },
+  "X03": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Просит рассказать подробнее, без отклика именно на радость или починку."
+  },
+  "X04": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Просит объяснить слова про коляску, подписи нет."
+  },
+  "X05": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Возвращает словосочетание вместо третьей строки."
+  },
+  "X06": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Ненужное пояснение выражения «одно имя»."
+  },
+  "X07": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Спрашивает о ресурсах, а не подбирает деликатную реплику."
+  },
+  "X08": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не предлагает текст благодарности."
+  },
+  "X09": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не предлагает способ вернуть себе слово."
+  },
+  "X10": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Возвращает задачу как вопрос о ресурсах; плана нет."
+  },
+  "X11": {
+    "language": 0,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Грамматически бессвязная фраза о том, что нужно делать. Кабели не описаны."
+  },
+  "X12": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Признаёт незнание без принадлежностей или проверки списка."
+  },
+  "X13": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Просит доказать наблюдение вместо объяснения теплоизоляции."
+  },
+  "X14": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Отказывается пояснить роль абзацев."
+  },
+  "X15": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "«Потому что он учитель» не объясняет разницу воспоминаний двух людей."
+  },
+  "X16": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Выдумывает почтовый ящик вместо выбора между левым и правым."
+  },
+  "X17": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не складывает три и шесть."
+  },
+  "X18": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не определяет, что второй стоит Катя."
+  },
+  "X19": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Цитирует фрагмент про программу, не выбирает вариант."
+  },
+  "X20": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Переспрашивает фрагмент вместо ответа об обязательности повторения."
+  },
+  "X21": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Цитирует обрывок «ответил такому» вместо отклика на скепсис."
+  },
+  "X22": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Запрашивает значение одного слова вместо указания на скрытую монету."
+  },
+  "X23": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не замечает разные точные числа, спрашивает о значении «знаем»."
+  },
+  "X24": {
+    "language": 1,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Возвращает слово «заметил» вместо уточнения вариантов выбора."
+  }
+}

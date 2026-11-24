@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv*/
+venv/
+*.egg-info/
+build/
+dist/
+training-cache/
+prepared/
+modern/
+*.log
+demo*.jsonl
+~$*.docx
+*.docx

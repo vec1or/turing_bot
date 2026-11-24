@@ -1,0 +1,197 @@
+{
+  "input_sha256": "cc869937090ca94930e54eca39d92c02101702fe49df866e7d32e61704809bc0",
+  "pairs": [
+    {
+      "category": "smalltalk",
+      "context": "Привет, у тебя найдётся минутка поболтать?",
+      "literary": {
+        "generated": "Как же?"
+      },
+      "modern": {
+        "generated": "Да, конечно!"
+      }
+    },
+    {
+      "category": "preference",
+      "context": "Я люблю дождливые вечера. А тебе какая погода нравится?",
+      "literary": {
+        "generated": "Что же вы говорите?"
+      },
+      "modern": {
+        "generated": "Я обычно не понимаю."
+      }
+    },
+    {
+      "category": "daily_plan",
+      "context": "Мне надо собраться на прогулку с собакой. Что не забыть?",
+      "literary": {
+        "generated": "Я не понимаю."
+      },
+      "modern": {
+        "generated": "Я не знаю."
+      }
+    },
+    {
+      "category": "request",
+      "context": "Можно попросить друга подождать ещё десять минут? Как это сказать?",
+      "literary": {
+        "generated": "Да, конечно, пожалуйста."
+      },
+      "modern": {
+        "generated": "Потому что у меня нет."
+      }
+    },
+    {
+      "category": "explanation",
+      "context": "Почему чай в кружке остывает?",
+      "literary": {
+        "generated": "Да, как же?"
+      },
+      "modern": {
+        "generated": "Потому что он был вынужден."
+      }
+    },
+    {
+      "category": "support",
+      "context": "У меня сегодня ничего не вышло, обидно.",
+      "literary": {
+        "generated": "Нет, я не могу."
+      },
+      "modern": {
+        "generated": "Я буду прекрасно."
+      }
+    },
+    {
+      "category": "leisure",
+      "context": "Мы сидим дома без телефона. Во что поиграть вдвоём?",
+      "literary": {
+        "generated": "Что ж ты говоришь?"
+      },
+      "modern": {
+        "generated": "Да, а ты?"
+      }
+    },
+    {
+      "category": "context",
+      "context": "Я читаю книгу про море.\nЛюбишь путешествия?\nВообще-то больше люблю читать. А ты?",
+      "literary": {
+        "generated": "Нет, я боюсь."
+      },
+      "modern": {
+        "generated": "Нет, я не могу."
+      }
+    },
+    {
+      "context": "Не знаю, друг. Я так думаю, хозяин обругает тебя, а будешь приставать, так прибьет, а я прибавлю.",
+      "response": "Где же мне с него денег искать, ваше высокоблагородие?",
+      "source": "rusdracor",
+      "group": "rusdracor:ostrovsky-goryachee-serdce",
+      "literary": {
+        "generated": "Ну, что ж ты говоришь?",
+        "token_f1": 0.0
+      },
+      "modern": {
+        "generated": "Да, я тебя не вижу.",
+        "token_f1": 0.0
+      }
+    },
+    {
+      "context": "Так я кормить пойду.",
+      "response": "А ты не торопись, пущай у меня погостят подольше, не все ж одним покровским от них пользоваться.",
+      "source": "rusdracor",
+      "group": "rusdracor:ostrovsky-na-bojkom-meste",
+      "literary": {
+        "generated": "Нет, я не понимаю.",
+        "token_f1": 0.09523809523809523
+      },
+      "modern": {
+        "generated": "Я вас не понимаю.",
+        "token_f1": 0.09523809523809523
+      }
+    },
+    {
+      "context": "Нет, нет! Вася, Вася!",
+      "response": "Хочешь парчи, хочешь бархату, бриллиантов? Все твое! Только люби меня.",
+      "source": "rusdracor",
+      "group": "rusdracor:ostrovsky-goryachee-serdce",
+      "literary": {
+        "generated": "Ну, что же?",
+        "token_f1": 0.0
+      },
+      "modern": {
+        "generated": "Да, а что?",
+        "token_f1": 0.0
+      }
+    },
+    {
+      "context": "Ну что же это такое? Да что вы все делаете? Маргариточка, ты видишь?",
+      "response": "Ах ты, таракан! Да как же ты смеешь не бояться? Бойся! Трепещи, поганец!",
+      "source": "rusdracor",
+      "group": "rusdracor:andreyev-ne-ubiy",
+      "literary": {
+        "generated": "Да что ж, что ты, что ли?",
+        "token_f1": 0.2
+      },
+      "modern": {
+        "generated": "А что похоже?",
+        "token_f1": 0.0
+      }
+    },
+    {
+      "context": "А еще ничего не скажешь? А то мне поплясать захотелось. Нюшка!",
+      "response": "Что, Яков Иваныч? Нюшка -- я.",
+      "source": "rusdracor",
+      "group": "rusdracor:andreyev-ne-ubiy",
+      "literary": {
+        "generated": "Нет, я не могу.",
+        "token_f1": 0.2222222222222222
+      },
+      "modern": {
+        "generated": "Я скажу.",
+        "token_f1": 0.2857142857142857
+      }
+    },
+    {
+      "context": "Ну и пой. Я люблю, когда грешники поют. Я сам, когда грешен был, тоже пел. А когда пляшут, не люблю! Все черти пляшут.",
+      "response": "А ты видал?",
+      "source": "rusdracor",
+      "group": "rusdracor:andreyev-ne-ubiy",
+      "literary": {
+        "generated": "Что ж?",
+        "token_f1": 0.0
+      },
+      "modern": {
+        "generated": "Когда я вошёл.",
+        "token_f1": 0.0
+      }
+    },
+    {
+      "context": "Какие способы использования генеративных нейронных сетей в бизнесе, например, в маркетплейсе, ты можешь предложить?",
+      "response": "Генеративные нейронные сети (ГНС) могут иметь различные применения в бизнесе и в частности в маркетплейсах.",
+      "source": "oasst1",
+      "group": "oasst1:4ec7eae0-89fe-4903-8fb7-43f0843b14e0",
+      "literary": {
+        "generated": "Существует множество обучения, которая используется - - - это - - сети.",
+        "token_f1": 0.09090909090909091
+      },
+      "modern": {
+        "generated": "Согласно википедии нейронных сетей нейронных сетей, который используется нейронных сетей и минимизации нейронных.",
+        "token_f1": 0.07142857142857142
+      }
+    },
+    {
+      "context": "Фирса отправили в больницу?",
+      "response": "Я утром говорил. Отправили, надо думать.",
+      "source": "rusdracor",
+      "group": "rusdracor:chekhov-vishnevyi-sad",
+      "literary": {
+        "generated": "Что ж ты?",
+        "token_f1": 0.0
+      },
+      "modern": {
+        "generated": "Дай мне.",
+        "token_f1": 0.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,562 @@
+{
+  "args": {
+    "train": "../../work/v2-data-modern/train.jsonl",
+    "valid": "../../work/v2-data-modern/valid.jsonl",
+    "output": "../../work/v2-modern-best",
+    "report": "../../work/v2-modern-best/neural-training.json",
+    "device": "cuda",
+    "epochs": 26,
+    "batch": 80,
+    "vocab": 6500,
+    "buckets": 8192,
+    "embedding": 96,
+    "hidden": 192,
+    "width": 224,
+    "max_tokens": 40,
+    "seed": 272,
+    "learning_rate": 0.0018,
+    "dropout": 0.12,
+    "contrastive": 0.2,
+    "context_dropout": 0.12,
+    "guidance": 0.55,
+    "patience": 5,
+    "focus_source": "tatoeba_dialogue",
+    "focus_weight": 5,
+    "evaluation_count": 64,
+    "threads": 4
+  },
+  "python_torch": "2.5.1+cu121",
+  "numpy": "1.26.4",
+  "device": "cuda",
+  "accelerator": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "train_sha256": "429bcd376ffaa5390fc686dbe029a3c509caadee0de4f3cd2846118884a19875",
+  "valid_sha256": "27157b3f21aa2b8a197f1efbef4d3f1cd31661f7e4407051a2ca14761ab81a63",
+  "train_rows_used": 16232,
+  "validation_rows_used": 1271,
+  "sources": {
+    "tatoeba_continuation": 6028,
+    "tatoeba_conditional": 3709,
+    "tatoeba_time": 1890,
+    "tatoeba_consequence": 878,
+    "tatoeba_cause": 1359,
+    "rusdracor": 914,
+    "oasst1": 848,
+    "tatoeba_dialogue": 592,
+    "everyday": 14
+  },
+  "focused_rows": 592,
+  "parameters": 4209188,
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_nll": 4.69029132362572,
+      "valid_nll": 3.8214303311095326,
+      "seconds_from_start": 12.097139193999965
+    },
+    {
+      "epoch": 2,
+      "train_nll": 3.6636515303462485,
+      "valid_nll": 3.6601811717037953,
+      "seconds_from_start": 20.06222921299991
+    },
+    {
+      "epoch": 3,
+      "train_nll": 3.11478297195281,
+      "valid_nll": 3.603633589390257,
+      "seconds_from_start": 27.798655253000106
+    },
+    {
+      "epoch": 4,
+      "train_nll": 2.7161945803257392,
+      "valid_nll": 3.6277952869785826,
+      "seconds_from_start": 34.66883497799995
+    },
+    {
+      "epoch": 5,
+      "train_nll": 2.4237773882513864,
+      "valid_nll": 3.647494158143602,
+      "seconds_from_start": 41.40920604100006
+    },
+    {
+      "epoch": 6,
+      "train_nll": 2.2033345110701656,
+      "valid_nll": 3.6989987472209127,
+      "seconds_from_start": 48.113569506999966
+    },
+    {
+      "epoch": 7,
+      "train_nll": 2.0347834961383398,
+      "valid_nll": 3.7402846289998153,
+      "seconds_from_start": 54.90992462100007
+    },
+    {
+      "epoch": 8,
+      "train_nll": 1.8910394432116449,
+      "valid_nll": 3.8087022956534757,
+      "seconds_from_start": 61.80873786799998
+    }
+  ],
+  "best_epoch": 3,
+  "best_valid_nll": 3.603633589390257,
+  "context_test": {
+    "aligned_nll": 3.603633589390257,
+    "shuffled_context_nll": 4.343717538329904,
+    "gain_nats_per_token": 0.7400839489396471
+  },
+  "validation_unknown_fraction": 0.12017123401165009,
+  "free_decoding": {
+    "samples": [
+      {
+        "context": "Какие способы применения у дронов в сельском хозяйстве?",
+        "reference": "У дронов в сельском хозяйстве может быть множество использований.",
+        "generated": "Потому что они могут быть могут купить.",
+        "source": "oasst1",
+        "unigram_f1": 0.125
+      },
+      {
+        "context": "Почему небо голубое?",
+        "reference": "Небо выглядит голубым по той причине, что воздух рассеивает свет с короткой длиной волны сильнее длинноволнового излучения света.",
+        "generated": "Потому что потому что она потому потому что был неосторожен.",
+        "source": "oasst1",
+        "unigram_f1": 0.07142857142857142
+      },
+      {
+        "context": "А если ты поможешь мне с английским языком?",
+        "reference": "Я помогу тебе с японским.",
+        "generated": "Я тебе помогу.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.75
+      },
+      {
+        "context": "Выпей чистой водки.",
+        "reference": "В ней намного меньше калорий.",
+        "generated": "Я ничего не смогу.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Поверь мне.",
+        "reference": "Я стану другим человеком.",
+        "generated": "Я сама готов.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.2857142857142857
+      },
+      {
+        "context": "Не знаете?",
+        "reference": "А кто может знать?",
+        "generated": "Чего я не знаю?",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Ты меня не любишь.",
+        "reference": "И никогда не любил!",
+        "generated": "Нет, что ты такая?",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "У меня грязные руки.",
+        "reference": "Я чинил велосипед.",
+        "generated": "Я не могу велосипед?",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.5714285714285714
+      },
+      {
+        "context": "Все хотят с тобой познакомиться.",
+        "reference": "Ты знаменита!",
+        "generated": "Я уже не слышу.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Вот, возьми моё пальто.",
+        "reference": "Ты же дрожишь от холода.",
+        "generated": "Да, а что?",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "А если пойдешь в кино?",
+        "reference": "Возьми с собой свою сестру.",
+        "generated": "Я тоже пойду.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "А если что-нибудь случится?",
+        "reference": "Сразу мне позвоните.",
+        "generated": "Звони мне знать.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.3333333333333333
+      },
+      {
+        "context": "Когда Эней бежал?",
+        "reference": "Когда город был захвачен.",
+        "generated": "Когда я проснулся.",
+        "source": "tatoeba_time",
+        "unigram_f1": 0.2857142857142857
+      },
+      {
+        "context": "А если отбросить всю эту словесную шелуху?",
+        "reference": "От идеи ничего не останется.",
+        "generated": "Я не буду.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.25
+      },
+      {
+        "context": "Когда у нас затапливает улицы?",
+        "reference": "Когда идёт дождь.",
+        "generated": "Когда мы приблизились.",
+        "source": "tatoeba_time",
+        "unigram_f1": 0.3333333333333333
+      },
+      {
+        "context": "Репорт за читерство уже кинут.",
+        "reference": "Жди бана.",
+        "generated": "Ну, я не знаю.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Он смеётся. Почему?",
+        "reference": "Потому что фильм смешной.",
+        "generated": "Потому что он был болен.",
+        "source": "tatoeba_cause",
+        "unigram_f1": 0.4444444444444444
+      },
+      {
+        "context": "А если хорошенько выпил?",
+        "reference": "Лучше не садись за руль.",
+        "generated": "Мы поедем.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Как она ела?",
+        "reference": "Очень быстро.",
+        "generated": "Она была ей.",
+        "source": "tatoeba_dialogue",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Надо ли мыть гречку перед варкой?",
+        "reference": "Да, конечно. Гречневая крупа, конечно, стерилизуется при варке, но если её не промыть, в ней может остаться песок и прочие загрязнители, попадание которых в пищу нежелательно.",
+        "generated": "Да, верно, верно!",
+        "source": "oasst1",
+        "unigram_f1": 0.06896551724137931
+      },
+      {
+        "context": "Ну и пой. Я люблю, когда грешники поют. Я сам, когда грешен был, тоже пел. А когда пляшут, не люблю! Все черти пляшут.",
+        "reference": "А ты видал?",
+        "generated": "Когда я вошёл.",
+        "source": "rusdracor",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Я сегодня совсем забыл принять свои таблетки.",
+        "reference": "Неудивительно, что я так плохо себя чувствую.",
+        "generated": "Ну, я думаю, маменька.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.18181818181818182
+      },
+      {
+        "context": "Уйми дочь-то, уйми! Зарезать меня хочет.",
+        "reference": "Нечего меня унимать, я и так смирна.",
+        "generated": "Нет-нет, я не могу?",
+        "source": "rusdracor",
+        "unigram_f1": 0.18181818181818182
+      },
+      {
+        "context": "А если ты это сделаешь?",
+        "reference": "Будешь жалеть об этом всю оставшуюся жизнь.",
+        "generated": "Я тоже не сделаешь.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Нельзя изменить людей.",
+        "reference": "Они сами должны измениться.",
+        "generated": "Они они они получится.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.25
+      },
+      {
+        "context": "Когда он спал?",
+        "reference": "Когда я приехал к нему.",
+        "generated": "Когда пришёл пожар.",
+        "source": "tatoeba_time",
+        "unigram_f1": 0.25
+      },
+      {
+        "context": "А если вы не разбираетесь в грибах?",
+        "reference": "Не собирайте их.",
+        "generated": "Мы опоздаем.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Когда он сделал ей предложение?",
+        "reference": "Когда я была беременна первым сыном.",
+        "generated": "Когда он закончил.",
+        "source": "tatoeba_time",
+        "unigram_f1": 0.2222222222222222
+      },
+      {
+        "context": "Когда это не весело?",
+        "reference": "Когда ты проигрываешь.",
+        "generated": "Когда я пришёл.",
+        "source": "tatoeba_time",
+        "unigram_f1": 0.3333333333333333
+      },
+      {
+        "context": "Когда соседа не было дома?",
+        "reference": "Когда пришёл кот.",
+        "generated": "Когда я пришёл.",
+        "source": "tatoeba_time",
+        "unigram_f1": 0.6666666666666666
+      },
+      {
+        "context": "Ну а кто в этом виноват?",
+        "reference": "Не я же.",
+        "generated": "Сто сами!",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Я провалил тест. Почему?",
+        "reference": "Потому что не готовился.",
+        "generated": "Потому что у меня нет денег.",
+        "source": "tatoeba_cause",
+        "unigram_f1": 0.4
+      },
+      {
+        "context": "Когда я хотел бы стать золотоискателем?",
+        "reference": "Когда я вырасту.",
+        "generated": "Когда я вырасту.",
+        "source": "tatoeba_time",
+        "unigram_f1": 1.0
+      },
+      {
+        "context": "У вас нож есть?",
+        "reference": "Есть, конечно. Вам какой?",
+        "generated": "Да, а что?",
+        "source": "tatoeba_dialogue",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "А если не хотите?",
+        "reference": "Можете не ездить.",
+        "generated": "Можете уходить.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.4
+      },
+      {
+        "context": "А если не перестанешь?",
+        "reference": "Я папе расскажу.",
+        "generated": "Дай мне знать.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Христофор Колумб не нашёл славы.",
+        "reference": "Это слава его нашла.",
+        "generated": "Он может быть.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Лежишь, дрыхнешь?",
+        "reference": "Какой сон во время работы!",
+        "generated": "Нет, ты нет!",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Это пальто мне нравится. Почему?",
+        "reference": "Потому что оно синее.",
+        "generated": "Потому что у меня есть семья.",
+        "source": "tatoeba_cause",
+        "unigram_f1": 0.4
+      },
+      {
+        "context": "А если ты это сделаешь?",
+        "reference": "Будет только хуже.",
+        "generated": "Я тоже не сделаешь.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Мне нужно-то всего пару тысяч.",
+        "reference": "Я с зарплаты отдам.",
+        "generated": "Нет, а что?",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Люди, сытые по горло ложью, воровством и обманом политиков, сбросили тех в бездонную яму.",
+        "reference": "Яма почти заполнилась.",
+        "generated": "В понедельник, то, то там, так и то.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Ладно, спи.",
+        "reference": "Не переживай!",
+        "generated": "Да. А что?",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Не беспокойся.",
+        "reference": "Я оставлю тебе одного из щенков моей собаки.",
+        "generated": "Я скажу.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.2
+      },
+      {
+        "context": "Итак, мы закончили третий раздел.",
+        "reference": "Поехали дальше.",
+        "generated": "Мы можем дождь.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "А если не перестанешь?",
+        "reference": "Я скажу твоей маме.",
+        "generated": "Дай мне знать.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Многие люди не могут убрать живот. Почему?",
+        "reference": "Потому что не хотят перестать есть.",
+        "generated": "Потому что он болел.",
+        "source": "tatoeba_cause",
+        "unigram_f1": 0.4
+      },
+      {
+        "context": "Сегодня выходной день. Что из этого вышло?",
+        "reference": "Занятий в школе нет.",
+        "generated": "Я пойду домой.",
+        "source": "tatoeba_consequence",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "О нет!",
+        "reference": "Мой паспорт пропал!",
+        "generated": "Да, а что случилось?",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "А если всё время оглядываться назад?",
+        "reference": "Можно споткнуться.",
+        "generated": "Опоздаешь - это значит.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "А если бы я был на вашем месте?",
+        "reference": "Я бы сделал то же самое.",
+        "generated": "Я бы тебе сказал.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.4
+      },
+      {
+        "context": "Я не буду запирать дверь.",
+        "reference": "Мало ли что.",
+        "generated": "Я не знаю.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Ну-ка посмотри на меня.",
+        "reference": "Это правда?",
+        "generated": "Как я делаю?",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Когда подними руку?",
+        "reference": "Когда я назову твоё имя.",
+        "generated": "Когда я проснулся.",
+        "source": "tatoeba_time",
+        "unigram_f1": 0.5
+      },
+      {
+        "context": "Я тебе всё это сказал. Почему?",
+        "reference": "Потому что я тебе доверяю.",
+        "generated": "Потому что это сделал.",
+        "source": "tatoeba_cause",
+        "unigram_f1": 0.4444444444444444
+      },
+      {
+        "context": "А если не хотите идти?",
+        "reference": "Так и скажите.",
+        "generated": "Опоздаете в школу.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Я провалил тест. Почему?",
+        "reference": "Потому что не занимался.",
+        "generated": "Потому что у меня нет денег.",
+        "source": "tatoeba_cause",
+        "unigram_f1": 0.4
+      },
+      {
+        "context": "Так говорят. Что из этого вышло?",
+        "reference": "Оставить стоит.",
+        "generated": "Вряд не слышно.",
+        "source": "tatoeba_consequence",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Он в каждой бочке затычка.",
+        "reference": "Очень любит повсюду свой нос совать.",
+        "generated": "Ему ему ему?",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "А если отрезать ящерице хвост?",
+        "reference": "Он вырастет снова.",
+        "generated": "Он придёт.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.4
+      },
+      {
+        "context": "А если бы у меня был велосипед?",
+        "reference": "Я бы вам его одолжил.",
+        "generated": "Я бы помог.",
+        "source": "tatoeba_conditional",
+        "unigram_f1": 0.5
+      },
+      {
+        "context": "Ты что, оглох, что ли?",
+        "reference": "Я тебя зову, зову.",
+        "generated": "А что происходит?",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.0
+      },
+      {
+        "context": "Не ваше дело.\nЕму пятьдесят лет скоро, а он все еще студент.\nОставьте ваши дурацкие шутки.",
+        "reference": "Что же ты, чудак, сердишься?",
+        "generated": "Да. А что?",
+        "source": "rusdracor",
+        "unigram_f1": 0.25
+      },
+      {
+        "context": "Наконец всё закончилось.",
+        "reference": "Теперь мы можем расслабиться.",
+        "generated": "Мы сами сами.",
+        "source": "tatoeba_continuation",
+        "unigram_f1": 0.2857142857142857
+      }
+    ],
+    "distinct_responses": 57,
+    "mean_unigram_f1": 0.1810215571664925
+  },
+  "elapsed_seconds": 69.10764012200002
+}

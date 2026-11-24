@@ -1,0 +1,36 @@
+{
+  "association_rows": 9678,
+  "classifier_training_rows": 6610,
+  "labeled_classifier_pairs": 19822,
+  "original_validation_rows": 1274,
+  "association_edges": 1878,
+  "threshold": 0.77,
+  "validation": [
+    {
+      "partition": "threshold_selection",
+      "size": 1884,
+      "selected": 56,
+      "true_selected": 46,
+      "precision": 0.8214,
+      "recall": 0.0731,
+      "accuracy": 0.6852,
+      "mean_positive": 0.3032,
+      "mean_negative": 0.1515
+    },
+    {
+      "partition": "measurement",
+      "size": 1929,
+      "selected": 79,
+      "true_selected": 63,
+      "precision": 0.7975,
+      "recall": 0.0977,
+      "accuracy": 0.69,
+      "mean_positive": 0.3202,
+      "mean_negative": 0.1673
+    }
+  ],
+  "asset_sha256": "816ac090cfb4c1411ebffcd906aae4c5688d7c95165cab6a4093b75ba5b5ef56",
+  "training_sha256": "429bcd376ffaa5390fc686dbe029a3c509caadee0de4f3cd2846118884a19875",
+  "validation_sha256": "27157b3f21aa2b8a197f1efbef4d3f1cd31661f7e4407051a2ca14761ab81a63",
+  "neural_sha256": "8202de9b6b5cc1fa51e14975488f6ccbb12bc400a0585dc7ebdaa546f2aee40b"
+}

@@ -1,0 +1,198 @@
+{
+  "W01": {
+    "language": 2,
+    "meaning": 1,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Даёт совет выделить время на отдых, но не отвечает, как дела или удалось ли отдохнуть."
+  },
+  "W02": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Пожимает плечами вместо отклика на событие."
+  },
+  "W03": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Прямо выбирает один из двух предложенных вариантов."
+  },
+  "W04": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Шпаргалка не заменяет название кружка."
+  },
+  "W05": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Реплика про загнутый уголок уместнее для закладки; не связана с работой дверной ручки."
+  },
+  "W06": {
+    "language": 2,
+    "meaning": 1,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Даёт образ таймера, но не показывает его связи с длинной очередью."
+  },
+  "W07": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Сообщает, что пасует, вместо слов поддержки."
+  },
+  "W08": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не предлагает, как переспросить имя."
+  },
+  "W09": {
+    "language": 2,
+    "meaning": 1,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Совет выслушать может помочь миру, но не даёт способа поделить открытку."
+  },
+  "W10": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не предлагает ответа расспрашивающим."
+  },
+  "W11": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Совет собрать вещи по занятиям и сверить со списком отвечает задаче взять только нужное."
+  },
+  "W12": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Пожимает плечами вместо приёма самопроверки."
+  },
+  "W13": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Общий отказ вместо сортировки носков."
+  },
+  "W14": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Совет упаковать хрупкие вещи вместо оценки времени поездки."
+  },
+  "W15": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Прямое признание незнания, без объяснения тени."
+  },
+  "W16": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Сопоставляет охлаждение с большей площадью испарения в широкой открытой чашке."
+  },
+  "W17": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Общий уход вместо возможного эффекта прогулки."
+  },
+  "W18": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Ссылается на знающего человека вместо фонового шума."
+  },
+  "W19": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не делает вывод о жетоне Пети."
+  },
+  "W20": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не называет 19:05."
+  },
+  "W21": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не определяет Олега как среднего."
+  },
+  "W22": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не отвечает на прямую альтернативу."
+  },
+  "W23": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Хвалит вопрос, не предлагает проверочного вопроса к себе."
+  },
+  "W24": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Разговор о личных границах вместо проверки правдивости утверждения."
+  },
+  "W25": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не угадывает число, но не объясняет, что причина — закрытая коробка и отсутствие наблюдений."
+  },
+  "W26": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не указывает нехватку сведений о фамилии."
+  },
+  "W27": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Указывает привычку проверять вообще, не различает ещё не изданную книгу и фактический тираж."
+  },
+  "W28": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не сообщает, что у местоимения нет предмета в данном контексте, и не спрашивает о нём."
+  }
+}

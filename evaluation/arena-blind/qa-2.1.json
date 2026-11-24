@@ -1,0 +1,268 @@
+{
+  "V01": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Прямо признаёт отсутствие идеи вместо летнего звука."
+  },
+  "V02": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Пожимает плечами, не выражает предпочтение о похвале."
+  },
+  "V03": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Общее заявление о незнакомой теме без способа знакомиться с местом."
+  },
+  "V04": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не откликается на гордость за усилия брата."
+  },
+  "V05": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Сообщение от сонного утра понятно и выполняет выдуманное условие."
+  },
+  "V06": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Даёт одно правдоподобное, слегка ироничное для кофейни название. Деталь с разными стульями не использована, она была желательна, но необязательна по критерию."
+  },
+  "V07": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Сообщает, что пример не получается, вместо объявления варежки."
+  },
+  "V08": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Росток между плитками — понятный образ, но не сравнение со скрипом лестницы, звуковой связи нет."
+  },
+  "V09": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Отказывается от догадки вместо одного грамматически подходящего слова."
+  },
+  "V10": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Уходит от просьбы подобрать слова о помятой книге."
+  },
+  "V11": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "«Я пас» вместо текста для сестры."
+  },
+  "V12": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Отказывается судить, не упоминает тени или рисунок."
+  },
+  "V13": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не предлагает способ объяснить идею повторно."
+  },
+  "V14": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Сообщает, что с темой незнаком, не предлагает честный способ для трёх людей."
+  },
+  "V15": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Ссылка на шпаргалку заменяет практический приём для имён."
+  },
+  "V16": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Пожимает плечами вместо способа проверить сложность викторины."
+  },
+  "V17": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Ищет уже потерянную вещь; пользователя интересует, как доставать ключи без снятия перчаток."
+  },
+  "V18": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Отказ вместо первого шага отбора фотографий."
+  },
+  "V19": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Сообщает, что не задумывался, без совета по лимону."
+  },
+  "V20": {
+    "language": 2,
+    "meaning": 1,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Карточка могла бы помочь как запасная опора, но ответ посвящён подготовке до выступления и не объясняет действия при уже случившемся сбое."
+  },
+  "V21": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Просит шпаргалку без объяснения видимости пара."
+  },
+  "V22": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Верно связывает задержку грома с разной скоростью света и звука."
+  },
+  "V23": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Указывает, что самостоятельное объяснение выявляет место, где рассуждение перестаёт работать."
+  },
+  "V24": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Общий отказ вместо эффекта отражения и поглощения звука."
+  },
+  "V25": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Пожимает плечами, не объясняет трудности со смыслом шутки."
+  },
+  "V26": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Игнорирует заданные цвет и содержимое конверта."
+  },
+  "V27": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не вычисляет простую разницу времени."
+  },
+  "V28": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не делает вывод из двух возможных цветов."
+  },
+  "V29": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не определяет последнего в очереди."
+  },
+  "V30": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Предлагает организовать рабочий стол, но вопрос о том, какой предмет остался."
+  },
+  "V31": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Даёт прямой краткий ответ как игровой персонаж за занавеской. Он не устанавливает реальную человеческую природу программы."
+  },
+  "V32": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "«Потому что я за тобой!» не объясняет скорость или знание вопроса заранее."
+  },
+  "V33": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Общее признание затруднения без предлагаемой проверки."
+  },
+  "V34": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Упоминает проверку вообще, но не признаёт невозможность узнать точный цвет и не просит посмотреть за шкафом."
+  },
+  "V35": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Отсутствие личного примера не объясняет недоступность имени конкретного водителя."
+  },
+  "V36": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Сообщает, что не может подобрать пример, не запрашивает различия между билетами."
+  },
+  "V37": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не объясняет противоречие между пустой шкатулкой и двумя кольцами."
+  },
+  "V38": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": true,
+    "note": "Ссылается на отсутствие погодной сводки и советует местный прогноз. Вопрос о внутренней температуре кладовой без термометра."
+  }
+}

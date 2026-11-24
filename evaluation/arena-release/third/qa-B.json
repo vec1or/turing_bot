@@ -1,0 +1,170 @@
+{
+  "X01": {
+    "language": 2,
+    "meaning": 2,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Выбирает занятие на свободный час и дополняет его чаепитием."
+  },
+  "X02": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Рассказывает про змея в детстве, оставив без ответа вопрос о запахе."
+  },
+  "X03": {
+    "language": 2,
+    "meaning": 1,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Делится собственной маленькой победой; не даёт реакции на починку ящика, которую просили оценить."
+  },
+  "X04": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Общий уход без подписи к фото."
+  },
+  "X05": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "«Я пас» вместо продолжения истории."
+  },
+  "X06": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Сообщает, что пример не получается, не называет кораблик."
+  },
+  "X07": {
+    "language": 2,
+    "meaning": 1,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Совет сказать правду спокойно отчасти уместен; просьба была о деликатной реплике про суп, вместо неё обсуждает личные границы."
+  },
+  "X08": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не предлагает записки соседям."
+  },
+  "X09": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Упоминает шпаргалку без совета говорящему."
+  },
+  "X10": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Отказывается распределить чтение по посильным этапам."
+  },
+  "X11": {
+    "language": 0,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Фраза обрывается и не предлагает пометить кабели."
+  },
+  "X12": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Тема плавательных принадлежностей ошибочно заменена академической честностью."
+  },
+  "X13": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Вместо механизма теплоизоляции говорит о привычке проверять вещи."
+  },
+  "X14": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Сомневается в догадке, не объясняет назначение абзацев."
+  },
+  "X15": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "Утверждение «он учитель» не объясняет разные воспоминания."
+  },
+  "X16": {
+    "language": 2,
+    "meaning": 0,
+    "generic": false,
+    "explicit_limit": false,
+    "note": "«Почтовый ящик» не предложен в условиях."
+  },
+  "X17": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Прямо отказывается вычислить число книг."
+  },
+  "X18": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Признаёт затруднение без вывода о Кате."
+  },
+  "X19": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Не отвечает на выбор человека или программы."
+  },
+  "X20": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Не отвечает, обязателен ли буквальный повтор."
+  },
+  "X21": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Общий уход от обсуждения возможности ошибки."
+  },
+  "X22": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": false,
+    "note": "Пожимает плечами вместо объяснения по скрытой монете."
+  },
+  "X23": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Воздерживается от угадывания, но не замечает столкновение двух точных чисел."
+  },
+  "X24": {
+    "language": 2,
+    "meaning": 1,
+    "generic": true,
+    "explicit_limit": true,
+    "note": "Отказывает вместо предметного запроса недостающих вариантов."
+  }
+}

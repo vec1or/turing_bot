@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "turing-arena-local"
+version = "2.2.0"
+description = "Локальный обучаемый генератор диалога на русском языке"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26,<3"]
+
+[project.scripts]
+turing-arena = "turing_bot.cli:main"
+
+[tool.setuptools]
+packages = ["turing_bot"]
+
+[tool.setuptools.package-data]
+turing_bot = ["assets/*.npz", "assets/*.json", "assets/*.gz", "assets/*.db"]
