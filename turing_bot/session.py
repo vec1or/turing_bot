@@ -323,8 +323,13 @@ class Session:
         parts = split_parts(question)
         if not parts:
             return None
+        if re.search(r"докаж|бот бы не|нейросеть бы не", question, re.I):
+            return None
         answers = [self._precise(p) for p in parts]
         if not all(answers):
+            return None
+        said = {a for _, a in self.history}
+        if any(a in said for a in answers):
             return None
         joined = answers[0] if answers[0] == answers[1] else answers[0].rstrip() + " " + answers[1]
         reply = display_text(joined)
@@ -401,6 +406,10 @@ class Session:
             return "Тогда тем более сказал бы прямо. С лучшим другом можно и надо говорить честно, иначе обида копится."
         if re.search(r"Астан|Караганд|Алмат", previous) and re.search(r"развлеч|скучно|чем заняться|куда сходить", q):
             return "Не скучно: кафешки, кино, вечером набережная. Ну и с друзьями всегда найдётся, чем заняться."
+        if "Шерлок" in previous and re.search(r"длинн|сколько (?:серий|сезонов)|долго смотреть", q):
+            return "Четыре сезона по три серии, но каждая по полтора часа, как фильм. За выходные можно осилить."
+        if "Была в школе" in previous and re.search(r"познакомил|как (?:вы )?встрет|расстал|почему", q):
+            return "В одном классе учились, на химии за одной партой сидели. А после выпуска она уехала учиться в Алматы, так и разошлись."
         if "Космонавтом" in previous and re.search(r"передумал|почему|не стал", q):
             return "Понял, что в космос берут после лётного училища, а я высоты боюсь. А игры делать можно и дома."
         if re.search(r"подар", earlier) and re.search(r"не любит цвет|цветы не", q):
