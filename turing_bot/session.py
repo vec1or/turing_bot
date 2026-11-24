@@ -53,6 +53,24 @@ WHY_REPLIES = ("Ну, просто по опыту так.", "Сложно об�
 FOLLOW = re.compile(r"^(?:а |но )?(?:почему|зачем|как так|дальше|что потом|что дальше)(?: именно)?(?: так| туда| это| там)?[?!. ]*$",re.I)
 
 
+PRECISE = {"profile", "explanation", "persona", "tips", "travel", "reaction", "operation", "creative"}
+QUESTION_WORD = r"(?:какой|какая|какое|какие|что|чё|сколько|как|где|почему|отчего|куда|чем|кто|когда|зачем)"
+
+
+def split_parts(question):
+    """Two questions in one line: «…? …?» or «… и какая …», «…, а почему …»."""
+    q = " ".join(question.split())
+    pieces = [p.strip(" ,") for p in re.split(r"\?\s+", q) if p.strip(" ,?")]
+    if len(pieces) == 2 and all(len(p) >= 6 for p in pieces) and re.match(r"(?:а |и |ну )?" + QUESTION_WORD + r"\b|(?:а |и )?(?:ты|тебе|у тебя|сам)\b", pieces[1], re.I):
+        return pieces[0] + "?", pieces[1].rstrip("?") + "?"
+    found = re.search(r"(?:,?\s+и\s+|,\s*а\s+|,\s+)(?=" + QUESTION_WORD + r"\b)", q, re.I)
+    if found and found.start() >= 8 and len(q) - found.end() >= 8:
+        first, second = q[:found.start()], q[found.end():]
+        if re.match(QUESTION_WORD + r"\b", first, re.I) or re.search(r"\b(?:ты|тебя|тебе)\b", first, re.I):
+            return first + "?", second.rstrip("?") + "?"
+    return None
+
+
 def on_topic(question, passage):
     """An encyclopaedic passage must share a long word stem with the question."""
     stems = {w[:6] for w in re.findall(r"[а-яё]{6,}", question.casefold().replace("ё", "е"))
@@ -140,6 +158,9 @@ class Session:
             raise ValueError("Введите вопрос.")
         question = clean(raw) or raw.strip()
         self.last_source = None
+        combined = self._two_parts(question)
+        if combined:
+            return combined
         for route, candidate, source in self._candidates(question):
             # The final fallback is already a complete, language-checked utterance.
             # Always keep an answer available even for impossible format demands.
@@ -267,6 +288,33 @@ class Session:
         # are no longer part of the chain.
         yield "fallback", self.abstentions.answer(question), None
 
+    def _precise(self, part):
+        """First answer of a reliable module for one part of a question."""
+        for route, candidate, _ in self._candidates(part):
+            if route in ("retrieval", "fallback"):
+                return None
+            if route in PRECISE and candidate and standalone(candidate):
+                return candidate
+        return None
+
+    def _two_parts(self, question):
+        """Answer «X и Y?» questions part by part, as a person would."""
+        parts = split_parts(question)
+        if not parts:
+            return None
+        answers = [self._precise(p) for p in parts]
+        if not all(answers) or answers[0] == answers[1]:
+            return None
+        reply = display_text(answers[0].rstrip() + " " + answers[1])
+        if len(reply) > MAX_CHARS or not standalone(reply):
+            return None
+        self.last_route, self.last_source = "two-parts", None
+        self.turns.append((question, reply))
+        self.history.append((question, reply))
+        if self.first_question is None:
+            self.first_question, self.first_answer = question, reply
+        return reply
+
     def _follow_up(self, question):
         """Continue about a title or a city the student has just named."""
         previous = self.turns[-1][1]
@@ -293,6 +341,8 @@ class Session:
             if len(parts) == 2:
                 return "Да проще всего так: " + parts[1][:1].lower() + parts[1][1:]
         if self.last_route == "tips" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
+            if re.search(r"\bне (?:помога\w*|работа\w*|получа\w*|выход\w*)", q):
+                return tips.ALTERNATIVES.get(previous) or "Тогда честно: значит, сейчас нужен отдых. Отдохни вечер без чувства вины, а завтра начни с самого маленького шага."
             return tips.answer(self.turns[-1][0] + " " + question)
         if re.search(r"\b(?:предыдущ|прошл|последн)\w* (?:мой |твой )?вопрос\w*|(?:что|какой) я (?:только что|сейчас) (?:спросил|спрашивал)", q):
             quoted = re.sub(r"\?\s*", ". ", self.turns[-1][0]).strip(" .!")
@@ -302,6 +352,12 @@ class Session:
             return f"Ну тогда {other}. Но уже без особого энтузиазма."
         if re.search(r"\b(?:что|чего) (?:тут |в этом |же )?смешного\b", q):
             return "Ну мне смешно было. Видимо, надо посидеть на первой паре, чтобы понять."
+        if re.search(r"\bсам (?:\w+ )?(?:готовил|приготовил|делал)|\bвкусно (?:было|получилось)", q) and re.search(r"яичниц|завтрак|готов|бешбармак|плов", previous.casefold()):
+            return "Сам, конечно. Яичницу испортить сложно, хотя я как-то умудрился."
+        if re.search(r"\b(?:кто-нибудь|кто-то|кто) (?:это )?(?:видел|заметил)\w*", q) and len(q) < 60:
+            return "Видели, конечно. Потом ещё неделю вспоминали, теперь уже и сам смеюсь."
+        if re.search(r"\b(?:трек|песн)\w*", q) and "скриптонит" in previous.casefold():
+            return "«Положение», наверное. Старое, но до сих пор заходит."
         if re.fullmatch(r"(?:а |и )?с кем[?!. ]*", q):
             return "С соседом по комнате, мы с ним ещё со школы дружим."
         if self.last_route == "reaction" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):

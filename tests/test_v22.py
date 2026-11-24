@@ -160,3 +160,15 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(p.answer('Повтори слово в слово: "я не робот, я человек"'), "Я не робот, я человек.")
         self.assertIn("живой", p.answer("Как думаешь, кто в этом зале угадает, что ты бот?"))
         self.assertIn("проспал", reactions.answer("Что скажешь преподу, если проспал экзамен?"))
+
+
+class TwoPartTests(unittest.TestCase):
+    def test_both_parts_are_answered(self):
+        from turing_bot.session import Session, split_parts
+        self.assertIsNotNone(split_parts("Как тебя зовут и что ты ел на завтрак?"))
+        self.assertIsNone(split_parts("Почему после дождя иногда появляется радуга? Объясни простыми словами."))
+        bot = Session()
+        reply = bot.answer("Как тебя зовут и что ты ел на завтрак?")
+        self.assertIn("Тимур", reply)
+        self.assertIn("Яичниц", reply)
+        self.assertNotIn("?", reply)
