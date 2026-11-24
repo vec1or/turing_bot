@@ -229,6 +229,7 @@ class Session:
         if self.turns and self.last_route == "reaction" and re.match(r"^(?:а|но|и) (?:если|когда|он|она|вдруг)\b", question, re.I):
             # «А если он опять опоздает?» continues the reported situation.
             yield "reaction", reactions.answer(self.turns[-1][0] + " " + question.rstrip(" ?") + ". Что ответишь?"), None
+            yield "reaction", reactions.speech(question.rstrip(" ?") + ". Что скажешь?"), None
         yield "reaction", reactions.answer(question), None
         yield "reaction", reactions.speech(question), None
         yield "travel", travel.answer(question), None
@@ -333,6 +334,12 @@ class Session:
             return "Как-то перед контрольной всей группе объяснял пределы на перемене, вот и прилипло. Я не против."
         if "чавка" in earlier and re.search(r"\b(?:сам|ты)\b.{0,20}чавка", q):
             return "Может, и чавкал, со стороны себя не слышно. Но если что, мне бы сказали, у нас в группе с этим не стесняются."
+        if "Пробовал в школе" in previous and re.search(r"\bродител\w*|\bмам\w*|\bпап\w*", q):
+            return "Про тот раз в школе — нет, и надеюсь, не узнают."
+        if re.search(r"«[^»]+»", previous) and re.search(r"(?:уже|я его|я это) (?:\w+ )?(?:смотрел|видел|читал)|смотрел уже|видел уже", q):
+            return "Тогда «Настоящий детектив», первый сезон. Мрачнее, но затягивает не хуже."
+        if "История Казахстана" in previous and re.search(r"\bпрепод\w*|\bпреподавател\w*", q):
+            return "Нормальный мужик, просто читает с листа и не любит вопросы. Строгий, но на экзамене не валит."
         if "Скриптонит" in previous and re.search(r"\b(?:кто (?:это|он|такой)|это (?:\w+ )?кто|не слышал|не знаю такого)\b", q):
             return "Ты чего, это рэпер из Павлодара, у нас его все знают. Голос низкий, биты медленные. Послушай «Это любовь», для начала норм."
         if re.search(r"анекдот|шутк|пошути", earlier) and re.search(r"\bсмешн\w*|\bсмеш\w*|\bне смешно", q):
