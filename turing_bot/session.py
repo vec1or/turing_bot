@@ -173,7 +173,7 @@ class Session:
                 if not standalone(reply):
                     continue
                 said = {a for _, a in self.history}
-                if reply in said and route != "recall" and route in ("profile", "persona", "travel", "tips", "follow-up"):
+                if reply in said and route != "recall" and route in ("profile", "persona", "travel", "tips", "follow-up", "reaction"):
                     # Only a re-asked question earns «я же говорил»; a keyword
                     # collision should fall through to the next candidate.
                     earlier_q = next((eq for eq, ea in self.history if ea == reply), "")
@@ -345,6 +345,12 @@ class Session:
             return "Как-то перед контрольной всей группе объяснял пределы на перемене, вот и прилипло. Я не против."
         if "чавка" in earlier and re.search(r"\b(?:сам|ты)\b.{0,20}чавка", q):
             return "Может, и чавкал, со стороны себя не слышно. Но если что, мне бы сказали, у нас в группе с этим не стесняются."
+        if "деда" in previous and re.search(r"\b(?:почему|зачем)\b", q):
+            return "Это память. Он мне его отдал, когда я в первый класс пошёл, чтобы маме звонил."
+        if "курьером" in previous and re.search(r"\b(?:сколько|скок|скока)\b|плати|зарплат", q):
+            return "Тысяч сто пятьдесят в месяц выходило, если каждый день катать. Для лета норм."
+        if "опаздывают" in previous and re.search(r"\bделаешь\b|\bборешься\b|\bреагируешь\b", q):
+            return "Говорю один раз спокойно. Если не доходит, просто перестаю ждать и иду по своим делам."
         if "гречку" in previous and re.search(r"\b(?:зачем|почему|нафига)\b", q):
             return "Ну чтобы не пригорала, логично же. Ерлан уже грозится отобрать у меня кастрюлю."
         if "геометри" in previous and re.search(r"\b(?:зачем|почему)\b", q):
