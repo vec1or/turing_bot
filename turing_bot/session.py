@@ -53,6 +53,14 @@ WHY_REPLIES = ("Ну, просто по опыту так.", "Сложно об�
 FOLLOW = re.compile(r"^(?:а |но )?(?:почему|зачем|как так|дальше|что потом|что дальше)(?: именно)?(?: так| туда| это| там)?[?!. ]*$",re.I)
 
 
+def on_topic(question, passage):
+    """An encyclopaedic passage must share a long word stem with the question."""
+    stems = {w[:6] for w in re.findall(r"[а-яё]{6,}", question.casefold().replace("ё", "е"))
+             if not w.startswith(("объясн", "просты", "словам", "почему", "работа", "расска"))}
+    text = passage.casefold().replace("ё", "е")
+    return any(s in text for s in stems)
+
+
 def display_text(text):
     text = unicodedata.normalize("NFC", " ".join(text.split()))
     if len(text) > MAX_CHARS:
@@ -245,10 +253,10 @@ class Session:
             # asked for explicitly; otherwise they read like a reference book.
             if EXPLICIT.search(question):
                 article = self.articles.propose(focus)
-                if article:
+                if article and on_topic(question, article[0]):
                     yield "article", article[0], article[1]
                 passage = self.knowledge.propose(focus)
-                if passage:
+                if passage and on_topic(question, passage[0]):
                     yield "reference", passage[0], "https://ru.wikipedia.org/?curid=" + str(passage[1])
         # The free generator, topic associations and word completion were
         # removed from the chain in 3.0: blind checks found them mostly
@@ -267,7 +275,8 @@ class Session:
             return None
         title = next((t for t in TITLES if t in previous), None)
         if re.search(r"\b(?:что|какой) (?:я )?(?:тебя )?(?:спросил|спрашивал|был (?:мой )?(?:первый )?вопрос)\w* (?:самым |в самом )?(?:первым|сначала|начале)|(?:мой )?первый вопрос", q) and self.first_question:
-            return f"Ты спросил: «{self.first_question.rstrip('?!. ')}». Я ещё не настолько устал."
+            quoted = re.sub(r"\?\s*", ". ", self.first_question).strip(" .!")
+            return f"Ты спросил: «{quoted}». Я ещё не настолько устал."
         singer = re.search(r"\bкто (?:ее|её|его|их) (?:поет|поёт|исполняет|написал|снял|играет)", q)
         if singer:
             name = next((n for n in ARTISTS if n.casefold() in previous.casefold()), None)
@@ -275,6 +284,10 @@ class Session:
                 return f"Да {name} же, я говорил."
         if re.search(r"\b(?:докажи|уверен|правда|серьезно|серьёзно)\b", q) and re.search(r"\b(?:человек|живой|студент|не нейросеть)\b", previous.casefold()):
             return "Ну как доказать. Могу сказать, что у меня сейчас затекла нога и очень хочется чаю. Бот бы до такого не додумался."
+        if re.search(r"\b(?:объясни|скажи|расскажи) (?:\w+ )?(?:попроще|проще)|\bне понял\w*|\bнепонятно\b", q) and len(q) < 60:
+            first = re.split(r"(?<=[.!])\s", previous, maxsplit=1)[0].rstrip(".")
+            if len(first) > 15:
+                return "Если совсем коротко: " + first[:1].lower() + first[1:] + "."
         if self.last_route == "tips" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
             return tips.answer(self.turns[-1][0] + " " + question)
         if re.fullmatch(r"(?:а |и )?с кем[?!. ]*", q):
