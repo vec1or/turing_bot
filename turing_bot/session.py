@@ -218,6 +218,9 @@ class Session:
                 if stem in earlier_q.casefold() or stem in earlier_a.casefold():
                     yield "recall", f"Я сказал: «{earlier_a.rstrip('.')}».", None
                     break
+        if self.turns and re.search(r"(?:последн\w*|прошл\w*|предыдущ\w*) (?:сообщени|вопрос)\w*.{0,30}\bя (?:тебе |тебя )?(?:писал|спрашивал|спросил|задал|отправлял)|(?:что|о ч[её]м) я (?:тебя |тебе )?(?:спрашивал|писал|спросил) (?:до этого|перед этим|только что|в прошлый раз)", question, re.I):
+            quoted = re.sub(r"\?\s*", ". ", self.turns[-1][0]).strip(" .!")
+            yield "recall", f"Ты спросил: «{quoted}». Я ещё не настолько устал."[:300], None
         if self.turns and REPEAT.search(question):
             previous = self.turns[-1][1]
             if len(previous) > 120:
@@ -345,6 +348,20 @@ class Session:
             return "Как-то перед контрольной всей группе объяснял пределы на перемене, вот и прилипло. Я не против."
         if "чавка" in earlier and re.search(r"\b(?:сам|ты)\b.{0,20}чавка", q):
             return "Может, и чавкал, со стороны себя не слышно. Но если что, мне бы сказали, у нас в группе с этим не стесняются."
+        product = re.fullmatch(r"(\d+), если в уме не ошибся\.", previous)
+        nums = re.findall(r"\d+", earlier)
+        if product and len(nums) >= 2 and re.search(r"\bкак\b.{0,20}(?:посчитал|считал|получил|вышло|понял)", q):
+            a, b = int(nums[0]), int(nums[1])
+            tens, units = b - b % 10, b % 10
+            if tens and units:
+                return f"Разбил на части: {a}·{tens} = {a * tens}, плюс {a}·{units} = {a * units}. Вместе {a * b}."
+            return f"Просто {a} умножил на {b} столбиком в голове, получилось {a * b}."
+        if re.search(r"яичниц", previous) and re.search(r"что (?:именно|конкретно)|что (?:ел|ты ел)", q):
+            return "Два яйца с помидором и хлеб. Ничего особенного, на скорость."
+        if "Маска" in previous and re.search(r"^(?:а |и |ну )?(?:почему|зачем)", q):
+            return "Интересно, как у него голова устроена. Мне бы хоть половину его продуктивности на сессию."
+        if re.search(r"брос", previous + " " + earlier) and re.search(r"уже бросил|не получается|не вышло|не выходит", q):
+            return "Тогда сказал бы, что вернуться не стыдно, восстановиться в универе можно. Зато попробовал и не будет жалеть всю жизнь."
         if "деда" in previous and re.search(r"\b(?:почему|зачем)\b", q):
             return "Это память. Он мне его отдал, когда я в первый класс пошёл, чтобы маме звонил."
         if "курьером" in previous and re.search(r"\b(?:сколько|скок|скока)\b|плати|зарплат", q):

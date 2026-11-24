@@ -153,6 +153,8 @@ def speech(question):
     norm = _norm(question)
     if len(norm) > 300 or not ASK_SPEECH.search(norm) or LATE.search(norm):
         return None
+    if re.search(r"\bвейп\w*|\bэлектронк\w*|\bсигарет\w*", norm) and re.search(r"\bмам\w*|\bпап\w*|\bродител\w*", norm):
+        return "Сказал бы честно, что это не мой. У меня его правда нет, я даже не курю. Но маме доказывать это пришлось бы долго."
     if re.search(r"нравится.{0,40}стесня|стесня.{0,40}нравится", norm):
         return "Сказал бы что-то простое, без признаний: «Привет, на следующую пару вместе пойдём». С малого начать легче, чем сразу всё выложить."
     if re.search(r"без подарка", norm):
