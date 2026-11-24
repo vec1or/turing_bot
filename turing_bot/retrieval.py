@@ -133,6 +133,8 @@ def persona_safe(reply):
         return False
     if re.search(r"€|\$|\bевро\b|\bдоллар\w*|\bгермани\w*|\bевроп\w*|\d+\s*(?:р|руб\w*)\b|\bрубл\w*|\bтрамва\w*|\bметро\b|\bэлектричк\w*", reply, re.I):
         return False
+    if "©" in reply or re.search(r"\b(?:профил\w* кбс|скидк\w*|акци\w*|звоните|заказывайте)\b", reply, re.I):
+        return False
     if re.search(r"\bне печата\w*|\bне человек\b|\bя (?:программа|машина|алгоритм)\b|\bв росси\w*|\bроссиян\w*", reply, re.I):
         return False
     if re.search(r"через двор|\bродител\w* .{0,20}живут|\bживут (?:рядом|недалеко|через)", reply, re.I):
