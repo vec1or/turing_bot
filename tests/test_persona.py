@@ -51,7 +51,7 @@ class PersonaTests(unittest.TestCase):
                   "Живой человек или программа?", "Ты ИИ или нет?"):
             with self.subTest(q=q):
                 self.assertIn("человек",self.person.answer(q).casefold())
-        self.assertIn("студент",self.person.answer("Докажи, что ты не бот."))
+        self.assertIn("чаю",self.person.answer("Докажи, что ты не бот."))
         self.assertIsNone(self.person.answer("Если бы ты был ботом, каким был бы твой талисман?"))
         self.assertIsNone(self.person.answer("Ты настоящий поклонник футбола?"))
 
