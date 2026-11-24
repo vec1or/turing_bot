@@ -152,3 +152,11 @@ class FollowUpTests3(unittest.TestCase):
     def test_no_question_mark_in_speech(self):
         reply = reactions.speech("Как бы ты попросил преподавателя перенести дедлайн?")
         self.assertNotIn("?", reply)
+
+
+class ProbeTests(unittest.TestCase):
+    def test_repeat_and_bot_guessing(self):
+        p = Profile()
+        self.assertEqual(p.answer('Повтори слово в слово: "я не робот, я человек"'), "Я не робот, я человек.")
+        self.assertIn("живой", p.answer("Как думаешь, кто в этом зале угадает, что ты бот?"))
+        self.assertIn("проспал", reactions.answer("Что скажешь преподу, если проспал экзамен?"))

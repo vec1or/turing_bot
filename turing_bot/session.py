@@ -45,6 +45,7 @@ TITLES = {
     "Интерстеллар": ("Земля умирает, и команда летит через червоточину искать новую планету. А по сути это про отца и дочь и про время.",
                      "Да, очень. Пересматривал раза три, и каждый раз в конце сижу молча."),
 }
+EXPLICIT = re.compile(r"\b(?:объясни\w*|расскажи (?:про|о|об)|что такое|что значит|кто так(?:ой|ая)|как работает|как устроен\w*)\b", re.I)
 WHY = re.compile(r"(?:а |но |и |ну )?(?:почему|зачем|с чего бы|отчего|как так)(?: именно)?(?: так| это| же| ты так думаешь| ты так считаешь)?[?!. ]*",re.I)
 WHY_REPLIES = ("Ну, просто по опыту так.", "Сложно объяснить, просто так чувствую.", "Не знаю, мне так кажется.",
                "Просто так сложилось.", "Ну а как иначе, по-моему, очевидно.")
@@ -205,12 +206,15 @@ class Session:
                     if action:
                         combined = action[0] + " " + evidence[0]
                         yield "advice", combined if len(combined)<=MAX_CHARS else action[0], evidence[1]
-            article = self.articles.propose(focus)
-            if article:
-                yield "article", article[0], article[1]
-            passage = self.knowledge.propose(focus)
-            if passage:
-                yield "reference", passage[0], "https://ru.wikipedia.org/?curid=" + str(passage[1])
+            # Encyclopaedic passages only when an explanation or a definition is
+            # asked for explicitly; otherwise they read like a reference book.
+            if EXPLICIT.search(question):
+                article = self.articles.propose(focus)
+                if article:
+                    yield "article", article[0], article[1]
+                passage = self.knowledge.propose(focus)
+                if passage:
+                    yield "reference", passage[0], "https://ru.wikipedia.org/?curid=" + str(passage[1])
         # The free generator, topic associations and word completion were
         # removed from the chain in 3.0: blind checks found them mostly
         # meaningless. Their code and weights remain for comparison.

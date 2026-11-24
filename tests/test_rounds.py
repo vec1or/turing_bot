@@ -49,3 +49,15 @@ class RoundTests(unittest.TestCase):
         self.assertRegex(writing.answer("Закончи фразу: «На ветке сидела …»",scene),r"^[А-ЯЁ][а-яё]+\.$")
         self.assertIsNotNone(limitation("Какая влажность сейчас в моей коробке?"))
         self.assertIsNone(limitation("Почему на улице сыро?"))
+
+
+class TypedAbstentionTests(unittest.TestCase):
+    def test_evasion_follows_the_shape_of_the_question(self):
+        from turing_bot.rounds import Abstentions
+        bot = Abstentions()
+        self.assertIn(bot.answer("Спасибо, было интересно поболтать!"), ("Мне тоже, спасибо!", "Взаимно, было весело.", "И тебе спасибо!"))
+        should = bot.answer("Стоит ли брать академ?")
+        self.assertTrue(should.startswith(("Смотря", "Я бы сначала", "Зависит")))
+        replies = {bot.answer(q) for q in ("А почему?", "А почему?", "А почему?", "А почему?")}
+        self.assertEqual(len(replies), 4)
+        self.assertTrue(all("?" not in r for r in replies))
