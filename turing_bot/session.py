@@ -54,7 +54,7 @@ FOLLOW = re.compile(r"^(?:а |но )?(?:почему|зачем|как так|д
 
 
 PRECISE = {"profile", "explanation", "persona", "tips", "travel", "reaction", "operation", "creative"}
-QUESTION_WORD = r"(?:какой|какая|какое|какие|что|чё|сколько|как|где|почему|отчего|куда|чем|кто|когда|зачем)"
+QUESTION_WORD = r"(?:какой|какая|какое|какие|что|чё|чо|че|сколько|как|где|почему|отчего|куда|чем|кто|когда|зачем)"
 
 
 def split_parts(question):
@@ -340,13 +340,17 @@ class Session:
             parts = re.split(r"(?<=[.!])\s", previous, maxsplit=1)
             if len(parts) == 2:
                 return "Да проще всего так: " + parts[1][:1].lower() + parts[1][1:]
+        if self.last_route == "explanation" and re.match(r"(?:а|и|ну) ", q):
+            again = explain(self.turns[-1][0] + " " + question)
+            if again and again != previous:
+                return again
         if self.last_route == "explanation" and re.search(r"\b(?:это )?(?:вредно|опасно|плохо|нормально)\b", q) and len(q) < 60:
             return "Если иногда, то ничего страшного. Но постоянно так лучше не делать."
         if self.last_route == "tips" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
             if re.search(r"\bне (?:помога\w*|работа\w*|получа\w*|выход\w*)", q):
                 return tips.ALTERNATIVES.get(previous) or "Тогда честно: значит, сейчас нужен отдых. Отдохни вечер без чувства вины, а завтра начни с самого маленького шага."
             return tips.answer(self.turns[-1][0] + " " + question)
-        if re.search(r"\b(?:предыдущ|прошл|последн)\w* (?:мой |твой )?вопрос\w*|(?:что|какой) я (?:только что|сейчас) (?:спросил|спрашивал)", q):
+        if re.search(r"\b(?:какой|что за|помнишь|повтори)\b.{0,20}\b(?:предыдущ|прошл)\w* (?:мой |твой )?вопрос\w*|(?:предыдущ|прошл)\w* (?:мой )?вопрос\w* (?:какой|был)|(?:что|какой) я (?:только что|сейчас) (?:спросил|спрашивал)", q):
             quoted = re.sub(r"\?\s*", ". ", self.turns[-1][0]).strip(" .!")
             return f"Ты спросил: «{quoted}»."
         if self.profile.last_choice and re.search(r"\bдруг(?:ой|ое|ую) вариант|\bвтор(?:ой|ое) вариант|если бы (?:пришлось|надо|нужно) (?:выбрать )?(?:друг|втор)", q):
@@ -360,6 +364,8 @@ class Session:
             return "Видели, конечно. Потом ещё неделю вспоминали, теперь уже и сам смеюсь."
         if "препод" in (previous + " " + self.turns[-1][0]).casefold() and re.search(r"\b(?:что (?:он|она) делал\w*|почему (?:именно )?(?:он|она))", q):
             return "Да придирался ко всему. На первой же паре выгнал полгруппы за опоздание на минуту."
+        if re.search(r"\bпочему (?:именно )?(?:там|туда|токио|япони\w*)", q) and re.search(r"токио|япони", previous.casefold()):
+            return "Там всё по-другому: еда, порядок, техника. Хочется пожить внутри этого, а не просто посмотреть на фото."
         if re.search(r"\b(?:трек|песн)\w*", q) and "скриптонит" in previous.casefold():
             return "«Положение», наверное. Старое, но до сих пор заходит."
         if re.fullmatch(r"(?:а |и )?с кем[?!. ]*", q):
@@ -385,7 +391,7 @@ class Session:
             if named:
                 # The first city named is the one the speaker is talking about.
                 data = min(named, key=lambda item: item[0])[1]
-                if re.search(r"\b(?:интересн\w*|посмотреть|сходить|посетить|красив\w*|делать)\b", q):
+                if re.search(r"\b(?:интересн\w*|посмотреть|сходить|посетить|красив\w*|делать|заняться)\b", q):
                     return data["place"]
                 for season, expr in travel.SEASONS:
                     if expr.search(q):
