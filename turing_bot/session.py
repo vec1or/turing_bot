@@ -153,7 +153,7 @@ def _word_problem(question):
     q = re.sub(r"\b(\d+|" + "|".join(_NUMWORDS) + r") (?:человек\w* )?" + verbs, r"\2 \1", q)
     q = re.sub(verbs + r" (?:тебе|мне|ему|ей|другу|подруге|маше|пете|им) ", r"\1 ", q)
     start = re.search(r"(?:у (?:меня|тебя|него|нее|мамы|\w+) (?:есть |было |лежит )?)?(\d+) (?:яблок|конфет|груш|мандарин|рубл|тенге|книг|карандаш|орех|печен|человек|пассажир|овец|птиц|машин)", q)
-    boxes = re.search(r"(\d+) (?:коробк|пакет|ящик|корзин|мешк|упаковк)\w* по (\d+) (?:\w+)", q)
+    boxes = re.search(r"(\d+) (?:коробк|пакет|ящик|корзин|мешк|упаковк|пачк|банк)\w* по (\d+) (?:\w+)", q)
     if boxes and re.search(r"сколько", q):
         start = boxes
         value = int(boxes[1]) * int(boxes[2])
@@ -833,6 +833,30 @@ class Session:
             if re.search(r"как(?:ой|ое) (?:сейчас |сегодня |щас )?год\b", ql):
                 from datetime import datetime as _dt
                 yield "profile", f"{_dt.now().year} же) Проверяешь, что ли.", None
+            if re.search(r"(?:напомни|помнишь).{0,40}сколько", ql) and getattr(self, "problem_result", None):
+                parts_r = [f"{self.problem_result} осталось)"]
+                ab_ = re.search(r"про (\w+) (?:рассказывал|говорил)", ql)
+                if ab_:
+                    st_ = ab_[1][:4]
+                    hit_ = next((ea for eq, ea in self.history if st_ in eq.casefold() or st_ in ea.casefold()), None)
+                    if hit_:
+                        first_ = re.split(r"(?<=[.!])\s", hit_, maxsplit=1)[0].rstrip(".")
+                        parts_r.append(f"А про {ab_[1]}: {first_[:1].lower() + first_[1:]}.")
+                yield "recall", " ".join(parts_r)[:300], None
+            if "очередь из двух" in last_a and re.search(r"очеред", ql):
+                yield "follow-up", "Ну утром да, Ерлан там по полчаса торчит. Я встаю раньше, чтобы успеть.", None
+            if "с велика" in last_a and re.search(r"сколько (?:\w+ )?(?:тебе )?(?:тогда )?(?:было|лет)", ql):
+                yield "follow-up", "Лет восемь, только кататься научился без страховки.", None
+            if re.match(r"мама", last_a.casefold()) and re.fullmatch(r"(?:а )?(?:как )?(?:\w+ )?(?:зовут|имя)(?: ее| её)?\W*", ql):
+                yield "follow-up", "Маму Гульмира зовут. Но для меня она просто мама)", None
+            if "мастера и маргариту" in last_a.casefold() and re.search(r"дочитал|и что|понравил", ql):
+                yield "follow-up", "Дочитал, конечно, за неделю. Воланд там лучший персонаж, а кот Бегемот вообще топ.", None
+            if re.search(r"поболтаем|отвлеч|выговорит", last_a.casefold()) and re.search(r"спасибо|легче|полегчало", ql):
+                yield "follow-up", "Рад, правда. Если что — пиши, я тут.", None
+            if "наушники" in last_a.casefold() and re.fullmatch(r"(?:а |и )?(?:давно|как давно)\W*", ql):
+                yield "follow-up", "Наушники с первого курса, мама на поступление подарила. Брелок — с девятого класса.", None
+            if "упал со сцены" in last_a and re.search(r"что (?:было )?потом|и что|дальше", ql):
+                yield "follow-up", "Встал, отряхнулся и дочитал стих под общий смех. Учительница потом сказала, что это было самое запоминающееся выступление)", None
             if "сестра" in recent and re.fullmatch(r"(?:а )?(?:как )?(?:\w+ )?(?:зовут|имя)(?: ее| её)?\W*", ql) and getattr(self, "user_name", None) == "Айгерим":
                 yield "follow-up", "Айгерим, как тебя, прикинь) Дома все зовут Айка.", None
             if "сестра" in recent and re.fullmatch(r"(?:а )?(?:как )?(?:\w+ )?(?:зовут|имя)(?: ее| её)?\W*", ql):
@@ -1016,6 +1040,9 @@ class Session:
         story = _word_problem(question)
         if story is not None:
             self.last_problem = question
+            num_s = re.match(r"-?\d+(?:,\d+)?", story)
+            if num_s:
+                self.problem_result = num_s[0]
             bq = question.casefold()
             bs = re.search(r"(\d+) (?:человек|пассажир)", bq)
             if bs and re.search(r"автобус|маршрутк|вагон", bq):
@@ -1042,7 +1069,7 @@ class Session:
                 hs = f"{mins // 60} ч" + (f" {mins % 60} мин" if mins % 60 else "")
                 yield "operation", f"{hs}, если без остановок: {d} делим на {v}.", None
         dist = re.search(r"(\d+(?:[.,]\d+)?) час\w* (?:\w+ )?(?:со скоростью |по )?(\d+) ?км|(\d+) ?км ?(?:/|в) ?ч\w*.{0,40}?(\d+(?:[.,]\d+)?) час", question, re.I)
-        dist_ok = bool(dist) and bool(re.search(r"расстояни|сколько (?:км|километр)|какой путь|сколько проедет", question, re.I)) and not re.search(r"\d+ мин", question, re.I)
+        dist_ok = bool(dist) and bool(re.search(r"расстояни|сколько (?:км|километр)|какой путь|сколько (?:\w+ )?(?:проедет|проехал|пройдет|прошел)", question, re.I)) and not re.search(r"\d+ мин", question, re.I)
         if dist_ok:
             t, v = (float(dist[1].replace(",", ".")), int(dist[2])) if dist[1] else (float(dist[4].replace(",", ".")), int(dist[3]))
             self.last_trip = (v, t)
@@ -1088,6 +1115,22 @@ class Session:
                 mins = round(int(far[1]) / v_ * 60)
                 self.last_minutes = mins
                 yield "operation", f"{mins // 60} ч" + (f" {mins % 60} мин" if mins % 60 else "") + f", если с той же скоростью {v_:g} км/ч.", None
+        trip_ = getattr(self, "last_trip", None)
+        back_v = re.search(r"(?:обратн\w*|назад).{0,30}?(\d+) ?км|(\d+) ?км ?(?:/|в) ?ч\w*.{0,20}обратн", question, re.I)
+        if trip_ and back_v and re.search(r"сколько (?:\w+ )?времени|за сколько|сколько (?:\w+ )?час", question, re.I):
+            v1_, t1_ = trip_
+            d_ = v1_ * t1_
+            v2_ = int(back_v[1] or back_v[2])
+            if v2_:
+                t2_ = d_ / v2_
+                self.trip_back = (d_, t1_, t2_)
+                m_ = round(t2_ * 60)
+                yield "operation", f"{m_ // 60} ч" + (f" {m_ % 60} мин" if m_ % 60 else "") + f": {d_:g} км делим на {v2_}.", None
+        tb_ = getattr(self, "trip_back", None)
+        if tb_ and re.search(r"средн\w* скорост", question, re.I):
+            d_, t1_, t2_ = tb_
+            avg_ = 2 * d_ / (t1_ + t2_)
+            yield "operation", f"Около {avg_:.0f} км/ч: {2 * d_:g} км за {t1_ + t2_:g} ч. Не среднее арифметическое, тут ловушка)".replace(".", ",", 1) if False else f"Около {avg_:.0f} км/ч: весь путь {2 * d_:g} км делим на всё время {f'{t1_ + t2_:g}'.replace('.', ',')} ч. Не среднее арифметическое, тут ловушка)", None
         question_n = re.sub(r"(\d+) с половиной", r"\1,5", question)
         speed = re.search(r"(\d+) ?км ?(?:/|в) ?ч", question_n, re.I)
         span = re.search(r"за (\d+(?:[.,]\d+)?) час\w*(?: (?:и )?(\d+) мин\w*)?|за (\d+) мин|за (полтора|пол ?часа|полчаса|два с половиной)(?: час\w*)?", question_n, re.I)
