@@ -222,7 +222,9 @@ class Retrieval:
         q_vec = self.encoder.context(question, previous)
         found = [int(i) for i in self.search(self.encoder.context(question), k)
                  if self.replies[i].casefold() not in seen and persona_safe(self.replies[i])
-                 and not SENSITIVE.search(self.replies[i])]
+                 and not SENSITIVE.search(self.replies[i])
+                 and not re.match(r"\s*[.,;:!)\-]", self.replies[i])
+                 and not re.search(r"мой лучший друг\s*-?\s*это я|не было возможности съездить", self.replies[i], re.I)]
         if not found:
             return None
         same = self.encoder.contexts([self.contexts[i] for i in found]) @ self.encoder.context(question)
