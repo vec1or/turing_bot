@@ -12,3 +12,4 @@ modern/
 demo*.jsonl
 ~$*.docx
 *.docx
+tools/team.json
