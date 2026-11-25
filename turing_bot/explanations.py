@@ -489,6 +489,8 @@ def explain(text):
         if idx == 0:
             if not matches("ветр ветер сквозня", tokens):
                 return mechanism + " От тепла и сухого воздуха это обычно происходит быстрее."
+        if "аденозину" in mechanism and matches("одн других кого-то", tokens):
+            continue
         if "радио" in effect and matches("наушник", tokens):
             continue
         if "дыхан" in subject and not matches("рта рот дыхан выдох мороз холод", tokens):

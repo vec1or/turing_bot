@@ -627,6 +627,12 @@ class Session:
             return "Папе проще: сказал бы коротко, что пересдам, и он кивнёт. Главное, чтобы от мамы он не первым узнал."
         if re.search(r"(?i)второй курс", previous) and re.search(r"сколько.{0,20}учиться|ещ[её] учиться|когда (?:\w+ )?закончишь", q):
             return "Ещё два с половиной года, бакалавриат четыре. А там, может, магистратура в Японии."
+        if re.search(r"ключ", earlier + " " + previous) and re.search(r"делать|как быть|что теперь", q):
+            return "Сначала пройтись по маршруту и спросить в автобусном парке, туда часто сдают. Если нет — вызвать мастера и поменять личинку, это недорого."
+        if re.search(r"Элджернон", previous) and re.search(r"читается|сложно|толст|страниц", q):
+            return "Не, легко, за пару вечеров. Там дневник героя, сначала даже с ошибками написан, это часть сюжета."
+        if re.search(r"«[^»]+»", previous) and re.search(r"(?:сложно|легко) (?:\w+ )?читается|толстая|сколько страниц", q):
+            return "Нормально читается, за пару вечеров осилишь."
         if title and re.search(r"грустн|печальн|страшн|тяжел", q):
             if title == "Интерстеллар":
                 return "Местами да, сцена с видеосообщениями прям давит. Но в целом он больше масштабный, чем грустный."
@@ -746,7 +752,7 @@ class Session:
             parts = re.split(r"(?<=[.!])\s", previous, maxsplit=1)
             if len(parts) == 2:
                 return "Да проще всего так: " + parts[1][:1].lower() + parts[1][1:]
-        if self.last_route == "explanation" and re.match(r"(?:а|и|ну) ", q):
+        if self.last_route == "explanation" and re.match(r"(?:а|и|ну) ", q) and not explain(question):
             again = explain(self.turns[-1][0] + " " + question)
             if again and again != previous:
                 return again
