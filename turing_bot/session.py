@@ -293,6 +293,9 @@ class Session:
             # The reason behind a retrieved reply is unknown; a person answers
             # such a «А почему?» briefly instead of inventing an argument.
             seen = {answer for _, answer in self.turns}
+            parts = re.split(r"(?<=[.!:])\s+", self.turns[-1][1])
+            if self.last_route in ("profile", "persona", "tips", "reaction", "follow-up") and len(parts) >= 2 and len(parts[1]) > 20 and not parts[1].startswith("«"):
+                yield "follow-up", "Ну я же говорю: " + parts[1][:1].lower() + parts[1][1:], None
             options = [r for r in WHY_REPLIES if r not in seen]
             if options:
                 yield "follow-up", options[len(self.turns[-1][1]) % len(options)], None
@@ -514,6 +517,12 @@ class Session:
             return "Я ж говорю, один пока. С той, школьной, полгода встречались, но это было давно."
         if "Яичниц" in previous and re.search(r"вкусно|на бегу|быстро|сам готовил", q):
             return "На бегу, доедал уже в лифте. Но горячая яичница на бегу всё равно лучше, чем ничего."
+        if re.match(r"(?:Уметь )?[Лл]етать", previous) and re.search(r"куда|где", q):
+            return "Над Астаной ночью, посмотреть на Байтерек сверху. А потом к бабушке, без пробок."
+        if re.search(r"брос|айти|универ", earlier) and re.search(r"родител", q) and re.search(r"сказать|объяснить", q):
+            return "Честно и с планом: «Мам, пап, я понял, что это не моё, и вот что хочу делать вместо этого». Без плана к ним лучше не идти."
+        if re.search(r"спис", earlier) and re.search(r"нравится|девушк", q):
+            return "Тогда дал бы, конечно, но заодно объяснил бы, как решать. Двойная польза: и помог, и повод пообщаться."
         if "в субботу" in previous and re.search(r"потом|дальше|и что", q):
             return "Посидел с охранником, попил чаю и пошёл домой. Родители до сих пор вспоминают."
         if re.search(r"миллион", earlier) and re.search(r"за сколько", q):
