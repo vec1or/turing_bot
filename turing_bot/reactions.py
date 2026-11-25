@@ -86,6 +86,9 @@ def _pick(options, question):
 
 
 def answer(question):
+    norm = _norm(question)
+    if re.search(r"проспал", norm) and re.search(r"пропустил|прогулял|не пришел|не пришёл|почему (?:\w+ )?не был", norm):
+        return "Сказал бы честно: «Извините, проспал. Конспект возьму у одногруппников и всё догоню»."
     case = read(question)
     if case is None:
         return None
