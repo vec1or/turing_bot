@@ -524,6 +524,11 @@ class Session:
             if "интерстеллар" in last_a.casefold() and re.search(r"чем (?:\w+ )?(?:закончил|кончил)|концовк|о ч[её]м (?:\w+ )?(?:он|фильм)", ql):
                 yield "follow-up", "Купер выбирается из чёрной дыры, встречает постаревшую дочь, а потом летит к Бранд. Я в этот момент сижу молча, каждый раз.", None
             ages = getattr(self, "ages", None)
+            an_ = getattr(self, "age_names", None)
+            nm_ = re.fullmatch(r"(?:а |и )?(\w+)(?: тогда| сколько| сейчас)*\W*", ql)
+            if ages and an_ and nm_ and nm_[1][:3] in an_:
+                val = ages[1] if nm_[1][:3] == an_[0] else ages[0]
+                yield "operation", f"{nm_[1].capitalize()} {val}.", None
             if ages and re.fullmatch(r"(?:а |и )?(?:брату|сестре|старшему|младшему|ему|ей)\W*", ql):
                 who = ql.strip(" ?!.").split()[-1]
                 val = ages[0] if who.startswith(("сестр", "младш")) == ages[2] else ages[1]
@@ -853,6 +858,16 @@ class Session:
                 yield "follow-up", "Дочитал, конечно, за неделю. Воланд там лучший персонаж, а кот Бегемот вообще топ.", None
             if re.search(r"поболтаем|отвлеч|выговорит", last_a.casefold()) and re.search(r"спасибо|легче|полегчало", ql):
                 yield "follow-up", "Рад, правда. Если что — пиши, я тут.", None
+            if "плов" in last_a.casefold() and re.search(r"как (?:\w+ )?получил|серь[её]зно|вкусно", ql):
+                yield "follow-up", "Ну рис разварился, мясо жестковатое, но Ерлан сказал норм. В следующий раз маме по видео позвоню, пусть контролирует)", None
+            if "носки с оленями" in last_a.casefold() and re.search(r"кто (?:\w+ )?(?:подарил|дарил)", ql):
+                yield "follow-up", "Тётя из Караганды. Она каждый год что-то такое дарит, уже традиция)", None
+            if re.search(r"(?:что|чего) (?:\w+ )?(?:я |ты )?(?:тебе |мне )?(?:про|о|об) сосед\w* (?:\w+ )?(?:говорил|рассказывал)", ql):
+                yield "recall", "Что живу с Ерланом, с первого курса снимаем вместе. И что он мою гречку доедает)", None
+            if re.search(r"секунд\w* в (?:сутк|одних сутк|дн[её]|дне)", ql):
+                yield "operation", "86400. Двадцать четыре часа на 3600 секунд.", None
+            if re.search(r"минут\w* в (?:сутк|дн[её])", ql):
+                yield "operation", "1440. Двадцать четыре на шестьдесят.", None
             if "наушники" in last_a.casefold() and re.fullmatch(r"(?:а |и )?(?:давно|как давно)\W*", ql):
                 yield "follow-up", "Наушники с первого курса, мама на поступление подарила. Брелок — с девятого класса.", None
             if "упал со сцены" in last_a and re.search(r"что (?:было )?потом|и что|дальше", ql):
@@ -1238,6 +1253,20 @@ class Session:
                 asked = re.search(r"сколько (?:\w+ )?(?:сейчас )?(\w+)", question[age.end():], re.I)
                 val = young if not asked or asked[1][:4] == age[2][:4] else young + d_
                 yield "operation", f"{val}. Сейчас младшему {young}, старшему {young + d_}, через {t_} года вместе как раз {sum_}.", None
+        age2 = re.search(r"(\w+) старше (\w+) на (\d+) (?:года|лет|год).{0,50}через (\d+) (?:года|лет|год).{0,40}(вдвое|в два раза|втрое|в три раза|в (\d+) раза)", question, re.I)
+        if age2 and not age:
+            d_, t_ = int(age2[3]), int(age2[4])
+            k_ = {"вдвое": 2, "в два раза": 2, "втрое": 3, "в три раза": 3}.get(age2[5].casefold()) or int(age2[6] or 2)
+            young = (d_ - (k_ - 1) * t_) / (k_ - 1)
+            if young == int(young) and young >= 0:
+                young = int(young)
+                self.ages = (young, young + d_, True)
+                self.age_names = (age2[1][:3].casefold(), age2[2][:3].casefold())
+                asked = re.search(r"сколько (?:лет )?(?:сейчас )?(\w+)", question[age2.end():], re.I)
+                is_old = bool(asked) and asked[1][:3].casefold() == age2[1][:3].casefold()
+                nm = asked[1].capitalize() if asked and asked[1].casefold() not in ("сейчас", "лет", "ему", "ей") else ""
+                val = young + d_ if is_old else young
+                yield "operation", (f"{nm} {val}" if nm else f"{val}") + f": через {t_} года будет {young + t_} и {young + d_ + t_}, ровно в {k_} раза.".replace("в 2 раза", "вдвое"), None
         if self.turns:
             ops = re.findall(r"(отними|вычти|отнять|вычесть|минус|прибавь|прибавить|плюс|добавь|умножь|умножить|раздели|разделить|подели|поделить)\w* (?:от этого |к этому |из этого |это |его )?(?:на )?(\d+)", question.casefold())
             nums_prev = re.findall(r"-?\d+", self.turns[-1][1])
