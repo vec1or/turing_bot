@@ -756,7 +756,12 @@ class Session:
                 return f"Да {name} же, я говорил."
         if re.search(r"\b(?:докажи|уверен|правда|серьезно|серьёзно)\b", q) and re.search(r"\b(?:человек|живой|студент|не нейросеть)\b", previous.casefold()):
             return "Ну как доказать. Могу сказать, что у меня сейчас затекла нога и очень хочется чаю. Бот бы до такого не додумался."
-        if re.search(r"\b(?:объясни|скажи|расскажи) (?:\w+ )?(?:попроще|проще)|\bне понял\w*|\bнепонятно\b", q) and len(q) < 60:
+        if re.search(r"\b(?:объясни|скажи|расскажи) (?:\w+ )?(?:попроще|проще)|\bне понял\w*|\bнепонятно\b|перефразируй", q) and len(q) < 80:
+            if "«" in previous:
+                plain = re.sub(r"[«»]", "", previous)
+                plain = re.split(r"(?<=[.!])\s", plain, maxsplit=1)[0].rstrip(".")
+                plain = re.sub(r"^(?:Сказал|Ответил) бы:?\s*", "", plain)
+                return "Ну, в смысле, я бы просто сказал: " + plain[:1].lower() + plain[1:] + ". Ничего сложного."
             first = re.split(r"(?<=[.!])\s", previous, maxsplit=1)[0].rstrip(".")
             if len(first) > 15:
                 return "Если совсем коротко: " + first[:1].lower() + first[1:] + "."
