@@ -250,6 +250,11 @@ class Session:
             if len(previous) > 120:
                 previous = previous[:117].rsplit(" ", 1)[0] + "…"
             yield "recall", f"Ну я же сказал: «{previous.rstrip('.')}».", None
+        typo = re.search(r"[\"«]([а-яёa-z]{3,})[\"»]", question, re.I)
+        if typo and re.search(r"задом наперед|задом наперёд|наоборот", question, re.I) and re.search(r"с ошибк|с опечатк|ошибись", question, re.I):
+            rev = typo[1][::-1].lower()
+            rev = rev[0] + rev[2] + rev[1] + rev[3:] if len(rev) > 3 else rev
+            yield "operation", f"{rev})) Специально ошибся, как просили.", None
         yield "operation", short_operation(question), None
         yield "reasoning", self.reasoning.answer(question), None
         # A previous *question* from a different spectator is not testimony.
@@ -257,12 +262,14 @@ class Session:
         extracted = self.reader.propose(question, history)
         if extracted:
             yield "reader", extracted[0], None
-        caveat = limitation(question)
+        caveat = None if re.search(r"что лучше|\bили\b", question, re.I) else limitation(question)
         if caveat:
             is_reflection = caveat.startswith(("Первое,", "Я бы проверил"))
             yield "reflection" if is_reflection else "abstention", caveat, None
         if self.turns and re.search(r"Караганд|Астан", self.turns[-1][1]) and re.search(r"(?:холодно|мороз|погода|тепло).{0,15}(?:сейчас|щас)|(?:сейчас|щас).{0,15}(?:холодно|мороз|погода|тепло)", question, re.I):
             yield "follow-up", "Сейчас уже минус десять-пятнадцать, а с ветром кажется все минус двадцать пять. Ноябрь, что ты хочешь.", None
+        if self.turns and re.search(r"опозд|ждал", self.turns[-1][0]) and re.search(r"(?:ты|сам) (?:бы )?обиделся|обидишься", question, re.I):
+            yield "follow-up", "Чуть-чуть бы обиделся. Но если пришёл с тортом — прощу.", None
         if self.turns and re.search(r"спис|отказ", self.turns[-1][0] + " " + self.turns[-1][1]) and re.search(r"обидел|обидится", question, re.I):
             yield "follow-up", "Ну обиделся и обиделся. Я ему ничего не должен, а разобраться помочь предлагал.", None
         if self.turns and re.search(r"опозд|ждал", self.turns[-1][0] + " " + self.turns[-1][1]) and re.search(r"не извинил|даже не извин|без извинен", question, re.I):
@@ -574,6 +581,8 @@ class Session:
             return "Чая чашек пять, кофе одну, и то в сессию. Энергетики — почти никогда."
         if re.search(r"деда", previous + " " + " ".join(a for _, a in list(self.turns)[-2:])) and re.search(r"заплати|денег|тысяч|\d+\s*к\b|продал", q):
             return "Даже за сто тысяч нет. Это память, такое не продаётся."
+        if "Ryzen" in previous and re.search(r"сам бы|взял бы|что из этого|какой бы", q):
+            return "Леново на Ryzen 5: у Ерлана такой третий год живой. Взял бы такой же."
         if "автобус" in previous and "проспал" in previous and re.search(r"поверил|поверит", q):
             return "Конечно нет. Посмеялся и отметил опоздание, но с тех пор я отмазки заранее продумываю."
         if re.search(r"миллион", earlier + " " + previous) and re.search(r"\d+ миллион|десять миллион|10 млн|лям", q):
