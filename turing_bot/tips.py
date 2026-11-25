@@ -181,6 +181,8 @@ def answer(question):
     for expr, text in TIPS:
         if expr.search(norm):
             lowered = text.casefold().replace("ё", "е")
+            if "таймер" in lowered and re.search(r"банал", norm):
+                return "Без банальщины: найди одногруппника и садитесь делать вместе по видеосвязи. Стыдно сачковать, когда на тебя смотрят, работает лучше любых таймеров."
             if banned and (banned[1][:5] in lowered or banned[1].startswith("помод") and "таймер" in lowered):
                 return ALTERNATIVES.get(text)
             return text
