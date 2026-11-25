@@ -260,7 +260,7 @@ class Session:
             yield "reaction", reactions.speech(question.rstrip(" ?") + ". Что скажешь?"), None
         yield "reaction", reactions.answer(question), None
         yield "reaction", reactions.speech(question), None
-        if not re.search(r"денег (?:ноль|нет)|без денег|бесплатн|на мели", question, re.I):
+        if not re.search(r"денег (?:ноль|нет|0|мало)|мало денег|без денег|бесплатн|на мели", question, re.I):
             yield "travel", travel.answer(question), None
         yield "profile", self.profile.answer(question), None
         yield "goal-plan", goal_plan.answer(question), None
@@ -465,6 +465,12 @@ class Session:
             return "Ответил бы за всех на экзамене и прочитал бы весь интернет. А потом, наверное, заскучал бы без бешбармака."
         if re.search(r"попадал в так|сам (?:\w+ )?попадал|с тобой (?:\w+ )?(?:такое )?было", q):
             return "Было пару раз что-то похожее. Тогда я примерно так и сделал, и вроде нормально вышло."
+        if "Шпору" in previous and re.search(r"поймал|спалил|заметил", q):
+            return "Сказал бы, что шпора не моя. Шучу — извинился бы и пошёл на пересдачу, что тут скажешь."
+        if "Яичниц" in previous and re.search(r"вкусно|на бегу|быстро|сам готовил", q):
+            return "На бегу, доедал уже в лифте. Но горячая яичница на бегу всё равно лучше, чем ничего."
+        if "в субботу" in previous and re.search(r"вспоминали|смеялись|узнали|дразнили", q):
+            return "До выпуска вспоминали. Каждую субботу кто-нибудь писал: «Ты там не в школе случайно». Теперь сам смеюсь."
         if re.match(r"(?:Бешбармак|Плов)", previous) and re.search(r"мама|мам\w*", q):
             return "Маме скажу, что её плов лучший. Дипломатия, все довольны."
         if re.search(r"матан|Матанализ", previous + " " + earlier) and re.search(r"не понимаю|ничего не понима|не шарю", q):
@@ -557,7 +563,7 @@ class Session:
             again = explain(self.turns[-1][0] + " " + question)
             if again and again != previous:
                 return again
-        if self.last_route == "explanation" and re.search(r"\b(?:это )?(?:вредно|опасно|плохо|нормально)\b", q) and len(q) < 60:
+        if self.last_route == "explanation" and re.search(r"\b(?:это )?(?:вредно|опасно|плохо|нормально)\b", q) and len(q) < 60 and not q.startswith(("почему", "зачем")):
             return "Если иногда, то ничего страшного. Но постоянно так лучше не делать."
         if self.last_route == "tips" and re.match(r"(?:а|и|ну) (?:если|вдруг|когда)\b", q):
             if re.search(r"\bне (?:помога\w*|работа\w*|получа\w*|выход\w*)", q) and not re.search(r"нигде не|спросят", q):
