@@ -267,6 +267,10 @@ class Session:
             rev = typo[1][::-1].lower()
             rev = rev[0] + rev[2] + rev[1] + rev[3:] if len(rev) > 3 else rev
             yield "operation", f"{rev})) Специально ошибся, как просили.", None
+        if typo and re.search(r"с ошибк|с опечатк|ошибись", question, re.I) and not re.search(r"задом|наоборот", question, re.I):
+            w = typo[1].lower()
+            bad = w.replace("о", "а", 1) if "о" in w else (w[:2] + w[3] + w[2] + w[4:] if len(w) > 4 else w + w[-1])
+            yield "operation", f"{bad}. Доволен))", None
         yield "operation", short_operation(question), None
         yield "reasoning", self.reasoning.answer(question), None
         # A previous *question* from a different spectator is not testimony.
