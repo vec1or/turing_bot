@@ -108,6 +108,28 @@ def meaningful_generation(answer, question):
     return bool(content and not set(content).issubset(re.findall("[а-яё]+", question.casefold())))
 
 
+def _chain_arithmetic(question, previous):
+    m = re.search(r"(?:из (?:этого|него|того|результата)|от (?:этого|него)) (?:\w+ )?(?:вычесть|отнять|минус) (\d+)|(?:к (?:этому|нему|результату)) (?:\w+ )?(?:прибавить|добавить|плюс) (\d+)|(?:это|его|результат) (?:\w+ )?(?:умножить|поделить|разделить) на (\d+)", question.casefold())
+    nums = re.findall(r"-?\d+", previous)
+    if not m or not nums:
+        return None
+    base = int(nums[-1])
+    if m[1]:
+        value = base - int(m[1])
+    elif m[2]:
+        value = base + int(m[2])
+    else:
+        k = int(m[3])
+        if re.search(r"умнож", question, re.I):
+            value = base * k
+        elif k and base % k == 0:
+            value = base // k
+        elif k:
+            return f"Примерно {base / k:.1f}".replace(".", ",") + ", ровно не делится."
+        else:
+            return None
+    return f"{value}. Это уже проще было."
+
 class Session:
     def __init__(self, directory=None):
         self.generator = Generator.load(directory)
@@ -218,7 +240,7 @@ class Session:
             yield "persona", f"Запомнил, {self.user_name}. Приятно познакомиться, я Тимур.", None
         if self.turns and re.search(r"около \d+ тысяч", self.turns[-1][1]) and re.search(r"долго (?:\w+ )?(?:думал|считал)|так не считают|не посчитал", question, re.I):
             yield "follow-up", "Так я и не считал точно, прикинул на глаз. Если надо до единицы — дай минуту и листочек.", None
-        if self.first_question and re.search(r"перв\w* (?:что|сообщени|вопрос|фраз)\w*.{0,25}(?:написал|спросил|писал|сказал)|(?:написал|спросил) (?:тебе )?(?:самым )?первым", question, re.I):
+        if self.first_question and re.search(r"перв\w* (?:что|сообщени|вопрос|фраз)\w*.{0,25}(?:написал|спросил|писал|сказал)|(?:написал|спросил) (?:у тебя |тебя |тебе )?(?:самым )?первым", question, re.I):
             quoted = re.sub(r"\?\s*", ". ", self.first_question).strip(" .!")
             yield "recall", f"Ты написал: «{quoted}». Помню, помню."[:300], None
         if re.search(r"(?:ты )?меня запомнишь|не забудешь меня", question, re.I):
@@ -255,6 +277,13 @@ class Session:
                     else:
                         yield "recall", f"Помню, конечно: «{first}»."[:300], None
                     break
+        about_food = re.search(r"\b(?:про|о|об) (?:еду|еде|ед[ыу]|завтрак\w*|обед\w*) (?:что )?(?:ты )?(?:ответил|сказал|говорил)", question.casefold())
+        if about_food and self.history:
+            for earlier_q, earlier_a in self.history:
+                if re.search(r"пое[лс]|завтрак|обед|ужин|\bед[аyуы]\b", earlier_q.casefold()):
+                    first = re.split(r"(?<=[.!])\s", earlier_a, maxsplit=1)[0].rstrip(".")
+                    yield "recall", f"Что {first[:1].lower() + first[1:]}. Помню, помню."[:300], None
+                    break
         about = re.search(r"\bчто (?:ты )?(?:отвечал|ответил|сказал|говорил|писал)\w* (?:про|о|об|насчет|насчёт) ([а-яё]{3,})", question.casefold())
         if about and self.history:
             stem = about[1][:5]
@@ -275,7 +304,7 @@ class Session:
                 previous = previous[:117].rsplit(" ", 1)[0] + "…"
             yield "recall", f"Ну я же сказал: «{previous.rstrip('.')}».", None
         typo = re.search(r"[\"«]([а-яёa-z]{3,})[\"»]", question, re.I)
-        if typo and re.search(r"задом наперед|задом наперёд|наоборот", question, re.I) and re.search(r"с ошибк|с опечатк|ошибись", question, re.I):
+        if typo and re.search(r"задом наперед|задом наперёд|наоборот", question, re.I) and re.search(r"с (?:\w+ )?ошибк|с (?:\w+ )?опечатк|ошибись", question, re.I):
             rev = typo[1][::-1].lower()
             rev = rev[0] + rev[2] + rev[1] + rev[3:] if len(rev) > 3 else rev
             yield "operation", f"{rev})) Специально ошибся, как просили.", None
@@ -283,6 +312,17 @@ class Session:
             w = typo[1].lower()
             bad = w.replace("о", "а", 1) if "о" in w else (w[:2] + w[3] + w[2] + w[4:] if len(w) > 4 else w + w[-1])
             yield "operation", f"{bad}. Доволен))", None
+        if self.turns:
+            chained = _chain_arithmetic(question, self.turns[-1][1])
+            if chained:
+                yield "operation", chained, None
+        trip = re.search(r"(\d+) ?км (?:в|/) ?ч\w*.{0,40}?(\d+) ?км|(\d+) ?км.{0,40}?(\d+) ?км (?:в|/) ?ч", question, re.I)
+        if trip and re.search(r"за сколько|сколько (?:времени|часов|ехать)", question, re.I):
+            v, d = (int(trip[1]), int(trip[2])) if trip[1] else (int(trip[4]), int(trip[3]))
+            if v:
+                h = d / v
+                hs = str(int(h)) if h == int(h) else f"{h:.1f}".replace(".", ",")
+                yield "operation", f"За {hs} ч, если без остановок: {d} делим на {v}.", None
         yield "operation", short_operation(question), None
         yield "reasoning", self.reasoning.answer(question), None
         # A previous *question* from a different spectator is not testimony.
@@ -294,7 +334,7 @@ class Session:
         if caveat:
             is_reflection = caveat.startswith(("Первое,", "Я бы проверил"))
             yield "reflection" if is_reflection else "abstention", caveat, None
-        if self.turns and re.search(r"Караганд|Астан", self.turns[-1][1]) and re.search(r"(?:холодно|мороз|погода|тепло).{0,15}(?:сейчас|щас)|(?:сейчас|щас).{0,15}(?:холодно|мороз|погода|тепло)", question, re.I):
+        if self.turns and not re.search(r"скучаешь", question, re.I) and re.search(r"Караганд|Астан", self.turns[-1][1]) and re.search(r"(?:холодно|мороз|погода|тепло).{0,15}(?:сейчас|щас)|(?:сейчас|щас).{0,15}(?:холодно|мороз|погода|тепло)", question, re.I):
             yield "follow-up", "Сейчас уже минус десять-пятнадцать, а с ветром кажется все минус двадцать пять. Ноябрь, что ты хочешь.", None
         if self.turns and re.search(r"опозд|ждал", self.turns[-1][0]) and re.search(r"(?:ты|сам) (?:бы )?обиделся|обидишься", question, re.I):
             yield "follow-up", "Чуть-чуть бы обиделся. Но если пришёл с тортом — прощу.", None
@@ -415,6 +455,12 @@ class Session:
         if len(q) > 120:
             return None
         title = next((t for t in TITLES if t in previous), None)
+        if re.search(r"автобус", previous) and re.search(r"сколько (?:примерно |это )?(?:по времени|времени|минут|ехать)", q):
+            return "На автобусе минут пятнадцать, если без пробок. Пешком, как сказал, около двадцати."
+        if re.search(r"разработчик|работать|специальност", previous) and re.search(r"родител\w* (?:что|как)|(?:что|как) (?:\w+ )?родител", q):
+            return "Мама говорит, лишь бы работа нормальная была. Папа сначала хотел, чтобы я на инженера шёл, но уже смирился."
+        if re.search(r"последнюю ночь", previous) and re.search(r"\bу меня\b", q):
+            return "Хз, мы ж только переписываемся. Может, задавать по сорок вопросов подряд, ахах."
         if re.search(r"\b(?:что|какой) (?:я )?(?:тебя )?(?:спросил|спрашивал|был (?:мой )?(?:первый )?вопрос)\w* (?:самым |в самом )?(?:первым|сначала|начале)|(?:мой )?первый вопрос", q) and self.first_question:
             quoted = re.sub(r"\?\s*", ". ", self.first_question).strip(" .!")
             return f"Ты спросил: «{quoted}». Я ещё не настолько устал."
@@ -492,7 +538,7 @@ class Session:
             return "У него голос такой, что под него хорошо думается. И он из Павлодара, свой, казахстанский."
         if re.search(r"спасаюсь|я сам так|сам так делаю", previous) and re.search(r"помога|работает|правда", q):
             return "Через раз, честно. Когда совсем лень, и таймер не спасает, но в среднем работает."
-        if re.search(r"списал", earlier) and re.search(r"не поверил|не верит|не поверит", q):
+        if re.search(r"спис", earlier) and re.search(r"не поверил|не верит|не поверит", q):
             return "Тогда попросил бы решить при нём другой вариант или пошёл бы к заведующему кафедрой. Если не списывал, доказать несложно."
         if "Космонавтом" in previous and re.search(r"сейчас|поменял|изменил|теперь", q):
             return "Хочу всё так же в айти, только теперь знаю, что это не игры делать, а сидеть над багами до ночи. Но всё равно нравится."
