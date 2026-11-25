@@ -243,6 +243,14 @@ class Session:
                     first = re.split(r"(?<=[.!])\s", earlier_a, maxsplit=1)[0].rstrip(".")
                     yield "recall", f"Помню: ты спрашивал «{quoted}», а я сказал «{first}»."[:300], None
                     break
+        asked2 = re.search(r"(?:спросил|спрашивал)\w* (?:тебя )?(?:про|о|об) ([а-яё]{3,}).{0,40}(?:помнишь|что (?:ты )?ответил)", question.casefold())
+        if asked2 and self.history:
+            stem = asked2[1][:3] if len(asked2[1]) <= 5 else asked2[1][:5]
+            for earlier_q, earlier_a in reversed(self.history):
+                if stem in earlier_q.casefold():
+                    first = re.split(r"(?<=[.!])\s", earlier_a, maxsplit=1)[0].rstrip(".")
+                    yield "recall", f"Помню, конечно: «{first}»."[:300], None
+                    break
         about = re.search(r"\bчто (?:ты )?(?:отвечал|ответил|сказал|говорил|писал)\w* (?:про|о|об|насчет|насчёт) ([а-яё]{3,})", question.casefold())
         if about and self.history:
             stem = about[1][:5]
@@ -585,6 +593,8 @@ class Session:
             return "Там красиво и тихо. Когда на паре скучно, смотрю и вспоминаю лето."
         if "короб" in earlier and re.search(r"собак", q):
             return "Собаки больше про хозяина: им важнее быть рядом с тобой, чем прятаться в коробке."
+        if re.search(r"мам", earlier) and re.search(r"обидит|обидел", q):
+            return "Тогда позвонил бы ещё раз и поговорил подольше. На маму долго обижаться не получается, она быстро отходит."
         if re.search(r"^(?:а |и )?(?:если|вдруг) (?:он|она) .{0,12}(?:обидится|обиделся|обиделась|разозлится)", q):
             return "Ну и пусть. Если дружба держится только на этом, то это так себе дружба."
         if re.search(r"без телефона|без интернета", earlier) and re.search(r"вместо|что бы (?:ты )?делал|чем бы (?:ты )?занимал", q):
@@ -619,6 +629,12 @@ class Session:
             return "С детства копаюсь в компьютерах, а на втором курсе понял, что логика и базы данных мне заходят больше, чем дизайн."
         if "Астан" in previous and "Караганд" not in previous and re.search(r"зимой (?:\w+ )?холодно|холодно зимой", q):
             return "Ещё как: минус тридцать с ветром бывает. Без шапки и шарфа лучше не выходить."
+        if "Караганд" in " ".join(a for _, a in list(self.turns)[-3:]) and re.search(r"вернул\w*|вернешься|вернёшься|жить туда|туда жить", q):
+            return "Вряд ли насовсем: в Астане работы больше. Но к родителям на праздники — всегда."
+        if re.search(r"спис", earlier) and re.search(r"отказал\w* прямо|прямо отказал|прямо (?:бы )?сказал", q):
+            return "Да, прямо, но спокойно. Сказал бы, что больше не дам, а объяснить, как решать, — без проблем."
+        if "правила конкурса" in previous and re.search(r"почему|боишься|зачем", q):
+            return "Не боюсь, просто правила такие: никаких контактов. Нарушу — дисквалифицируют, а я уже втянулся."
         if "Ryzen" in previous and re.search(r"сам бы|взял бы|что из этого|какой бы", q):
             return "Леново на Ryzen 5: у Ерлана такой третий год живой. Взял бы такой же."
         if "автобус" in previous and "проспал" in previous and re.search(r"поверил|поверит", q):
