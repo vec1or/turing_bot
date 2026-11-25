@@ -341,7 +341,7 @@ class Session:
         parts = split_parts(question)
         if not parts:
             return None
-        if re.search(r"докаж|бот бы не|нейросеть бы не", question, re.I):
+        if re.search(r"докаж|бот бы не|нейросеть бы не|если бы", question, re.I):
             return None
         answers = [self._precise(p) for p in parts]
         if not all(answers):
@@ -474,6 +474,8 @@ class Session:
             return "Было пару раз что-то похожее. Тогда я примерно так и сделал, и вроде нормально вышло."
         if re.search(r"миллион", earlier + " " + q) and re.search(r"потратил|на что|куда (?:бы )?дел", q) and "Японию" not in previous:
             return "Сначала помог бы родителям, потом съездил бы в Японию. Остальное отложил бы, а то знаю себя — разлетится за месяц."
+        if "Скриптонит" in previous and re.search(r"назови|конкретн|кого (?:ещ[её]|именно)|кто ещ[её]", q):
+            return "Скриптонит в первую очередь. Ещё Джа Халиб и Ирина Кайратовна, когда настроение получше."
         if "Тысяч сорок" in previous and re.search(r"много|мало|нормально", q):
             return "Для студента нормально. С доставкой улетало бы в два раза больше, проверено."
         if re.search(r"подар", earlier) and re.search(r"безделуш|не любит (?:всякие|вещи)|ничего не надо", q):
