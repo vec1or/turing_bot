@@ -216,7 +216,7 @@ class Session:
         if intro:
             self.user_name = intro[1][:1].upper() + intro[1][1:].lower()
             yield "persona", f"Запомнил, {self.user_name}. Приятно познакомиться, я Тимур.", None
-        if self.turns and re.search(r"около \d+ тысяч", self.turns[-1][1]) and re.search(r"долго|не считают|так не", question, re.I):
+        if self.turns and re.search(r"около \d+ тысяч", self.turns[-1][1]) and re.search(r"долго (?:\w+ )?(?:думал|считал)|так не считают|не посчитал", question, re.I):
             yield "follow-up", "Так я и не считал точно, прикинул на глаз. Если надо до единицы — дай минуту и листочек.", None
         if self.first_question and re.search(r"перв\w* (?:что|сообщени|вопрос|фраз)\w*.{0,25}(?:написал|спросил|писал|сказал)|(?:написал|спросил) (?:тебе )?(?:самым )?первым", question, re.I):
             quoted = re.sub(r"\?\s*", ". ", self.first_question).strip(" .!")
@@ -572,6 +572,8 @@ class Session:
             return "Чая чашек пять, кофе одну, и то в сессию. Энергетики — почти никогда."
         if re.search(r"деда", previous + " " + " ".join(a for _, a in list(self.turns)[-2:])) and re.search(r"заплати|денег|тысяч|\d+\s*к\b|продал", q):
             return "Даже за сто тысяч нет. Это память, такое не продаётся."
+        if self.last_route == "explanation" and re.search(r"у тебя (?:\w+ )?(?:так|тоже|такое) (?:\w+ )?бывает|ты (?:сам )?(?:тоже|так) (?:\w+ )?(?:делаешь|чувствуешь)", q):
+            return "Бывает, конечно, я же тоже человек. Особенно в сессию, когда темнеет в пять."
         if re.search(r"завал|двойк|пересда", earlier + " " + previous) and re.search(r"орать|ругать|кричать|наругают", q):
             return "Поорут и успокоятся. Главное сразу сказать, что уже записался на пересдачу, это сильно смягчает."
         if re.search(r"без телефона|без интернета", earlier) and re.search(r"заплати|тысяч|\d+\s*к\b|денег", q):
