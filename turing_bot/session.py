@@ -314,6 +314,8 @@ class Session:
         yield "goal-plan", goal_plan.answer(question), None
         if self.turns and re.search(r"анекдот|шутк|пошути", self.turns[-1][0], re.I) and re.search(r"смешн|смеш", question, re.I):
             yield "follow-up", self._follow_up(question), None
+        if re.search(r"неб", question, re.I) and re.search(r"голуб|син", question, re.I) and re.search(r"пятиклас|ребен|ребён|простыми|по-простому|как другу|для тупых", question, re.I):
+            yield "explanation", "Солнечный свет — это смесь всех цветов. Синий самый «прыгучий»: он отскакивает от воздуха во все стороны, поэтому кажется, что синее всё небо.", None
         yield "explanation", explain(question), None
         # Resolve a request for direct speech before planning a practical action.
         # A problem in the premise (e.g. lateness) need not be the requested task.
@@ -331,7 +333,7 @@ class Session:
             # such a «А почему?» briefly instead of inventing an argument.
             seen = {answer for _, answer in self.turns}
             parts = re.split(r"(?<=[.!:])\s+", self.turns[-1][1])
-            if self.last_route in ("profile", "persona", "tips", "reaction", "follow-up") and len(parts) >= 2 and len(parts[1]) > 20 and not parts[1].startswith("«"):
+            if self.last_route in ("profile", "persona", "tips", "reaction", "follow-up") and len(parts) >= 2 and len(parts[1]) > 20 and not parts[1].startswith("«") and not re.search(r"думать особо нечего|Без вариантов|Однозначно|не сомневаюсь|Даже представлять", parts[1]):
                 yield "follow-up", "Ну я же говорю: " + parts[1][:1].lower() + parts[1][1:], None
             options = [r for r in WHY_REPLIES if r not in seen]
             if options:
@@ -625,6 +627,14 @@ class Session:
             return "Папе проще: сказал бы коротко, что пересдам, и он кивнёт. Главное, чтобы от мамы он не первым узнал."
         if re.search(r"(?i)второй курс", previous) and re.search(r"сколько.{0,20}учиться|ещ[её] учиться|когда (?:\w+ )?закончишь", q):
             return "Ещё два с половиной года, бакалавриат четыре. А там, может, магистратура в Японии."
+        if title and re.search(r"грустн|печальн|страшн|тяжел", q):
+            if title == "Интерстеллар":
+                return "Местами да, сцена с видеосообщениями прям давит. Но в целом он больше масштабный, чем грустный."
+            return "Местами, но в целом нормальный, не депрессивный. После него не хочется лежать лицом в стену."
+        if re.search(r"ЕНУ|Астан", previous) and re.search(r"общаг", q):
+            return "Общаги есть, по три-четыре человека в комнате, кухня на этаж и очередь в душ утром. Я в общагу не попал, поэтому снимаем с другом."
+        if re.search(r"бег|пробежк", earlier) and re.search(r"утром|не вста", q):
+            return "Тогда бегай вечером, после пар. Главное — регулярность, а не время."
         if "Тьм" in previous and re.search(r"длинн|сезон|серий", q):
             return "Три сезона, серий по восемь-десять. За неделю реально осилить."
         if re.search(r"первокурсник|первый день", earlier) and re.search(r"\bсам\b|\bты\b", q) and re.search(r"чувствовал|как было|страшно|волновал", q):
