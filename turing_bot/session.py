@@ -237,6 +237,43 @@ def _words(n):
     return str(n)
 
 
+def _casual_ref(text):
+    """Turn a reference-book sentence into how a student would say it."""
+    m = re.match(r"([^—–]{2,60}?)\s+[—–-]\s+(.+)", text or "")
+    if not m:
+        return text
+    body = m[2]
+    body = re.sub(r"\s*\([^)]*\)", "", body)
+    body = re.split(r"(?<=[.!])\s", body, maxsplit=1)[0]
+    if len(body) > 170:
+        cut = [i for i in (body.find(", "), body.find(" при "), body.find(" в которо")) if 40 <= i <= 170]
+        body = body[:min(cut)] if cut else body[:170].rsplit(" ", 1)[0]
+    body = body.rstrip(" .,;:")
+    return f"Если по-школьному, это {body[:1].lower() + body[1:]}. Как-то так, по памяти)"
+
+
+CASUAL_DEFS = {
+    "теннис": "Ну спорт такой: ракетками бьют мяч через сетку, один на один или парами. Я сам только в настольный в школе играл.",
+    "настольный теннис": "Пинг-понг же. Маленький шарик, ракетки, стол с сеткой. В школе на переменах рубились.",
+    "футбол": "Ну футбол: две команды, мяч, ворота, ногами играют. Я за Реал болею, если что.",
+    "баскетбол": "Мяч в кольцо закидывать, пять на пять. Я с моим ростом не очень, если честно)",
+    "волейбол": "Мяч через сетку руками перекидывают, шесть на шесть. На физре в основном в него и играем.",
+    "хоккей": "На льду, с клюшками и шайбой. У нас Барыс же, в Астане в хоккей любят.",
+    "шахматы": "Ну доска восемь на восемь, фигуры, задача — поставить мат королю. Играю так себе, дедушка учил.",
+    "шашки": "Тоже на доске, но проще шахмат: съедаешь фишки соперника, прыгая через них. В детстве с дедом играли.",
+    "бокс": "Бой на кулаках в перчатках, по раундам. У нас Головкина все знают.",
+    "плавание": "Ну плавать на скорость, разными стилями. Я плаваю, но так, чтобы не утонуть)",
+    "кокпар": "Это когда всадники козлиную тушу друг у друга отбирают. На Наурыз в ауле видел, жёстко.",
+    "асык ату": "Игра с бараньими косточками, сбиваешь их битой. Дед в детстве учил, у меня даже свой сака был.",
+    "бешбармак": "Мясо с тестом, варёное, сверху лук и сорпа. Бабушкин лучший, без вариантов.",
+    "кумыс": "Кобылье молоко, кисловатое такое. Бабушка любит, я не особо, если честно.",
+    "домбра": "Казахский инструмент, две струны. Меня в детстве отдали, но я через полгода бросил.",
+    "наурыз": "Праздник весны, двадцать второго марта. Наурыз-коже варят, все в гости ходят.",
+    "интернет": "Ну сеть, где все сидят) Без него я бы ни одну лабу не сдал.",
+    "любовь": "Сложно сказать. Наверное, когда человек важнее тебя самого, и тебе от этого нормально.",
+}
+
+
 class Session:
     def __init__(self, directory=None):
         self.generator = Generator.load(directory)
@@ -1003,6 +1040,18 @@ class Session:
                 yield "profile", "Не, пока нету) После школы расстались, с тех пор один.", None
             if "пока нету" in last_a and re.fullmatch(r"(?:а |и )?(?:давно|как давно|почему)\W*", ql):
                 yield "follow-up", "Да уже года полтора. Она в Алматы поступила, я в Астану, на расстоянии не вывезли.", None
+            if re.search(r"(?:то есть|значит|выходит) (?:ты )?не человек|ты не человек|не человек (?:ты|что ли)", ql):
+                yield "profile", "Да человек я, человек) Просто не сразу понял, к чему ты клонишь.", None
+            if re.search(r"(?:^|\W)ты (?:же |ведь |точно |вообще )?(?:живой )?человек(?: же| ведь)?\W*$|ты (?:же|ведь) человек", ql) and not re.search(r"какой|хороший|плохой|добрый", ql):
+                yield "profile", "Человек, конечно) Тимур, второй курс ЕНУ.", None
+            if re.search(r"(?:бот|робот).{0,60}проиграл|проиграл.{0,40}(?:бот|робот)", ql):
+                yield "profile", "Ну проиграл так проиграл) Но я правда человек, просто отвечаю как умею.", None
+            if (last_a in DENIALS or re.search(r"человек, конечно|человек я, человек|правда человек", last_a.casefold())) and re.fullmatch(r"(?:и|ну и) (?:ч[её]|что|чо|дальше)\W*|и\W*", ql):
+                yield "follow-up", "Да ничего) Человек как человек. Спрашивай дальше.", None
+            term_ = re.search(r"(?:что такое|что значит|что за) ([а-яё\- ]{3,30}?)\W*$", ql)
+            if term_ and term_[1].strip() in CASUAL_DEFS:
+                pre_ = "Ой, не туда понесло) " if re.search(r"при ?ч[её]м|я (?:же )?спрашивал|я (?:же )?спросил", ql) else ""
+                yield "profile", pre_ + CASUAL_DEFS[term_[1].strip()], None
             if "наушники" in last_a.casefold() and re.fullmatch(r"(?:а |и )?(?:давно|как давно)\W*", ql):
                 yield "follow-up", "Наушники с первого курса, мама на поступление подарила. Брелок — с девятого класса.", None
             if "упал со сцены" in last_a and re.search(r"что (?:было )?потом|и что|дальше", ql):
@@ -1679,10 +1728,15 @@ class Session:
             if EXPLICIT.search(question):
                 article = self.articles.propose(focus)
                 if article and on_topic(question, article[0]):
-                    yield "article", article[0], article[1]
+                    yield "article", _casual_ref(article[0]), article[1]
                 passage = self.knowledge.propose(focus)
+                term_ = re.search(r"(?:что такое|что значит|что за|кто такой|кто такая) ([а-яё\- ]{3,40}?)\W*$", question.casefold())
+                if passage and (re.search(r"росси|ссср|советск", passage[0], re.I) and not re.search(r"росси|ссср|советск", question, re.I)):
+                    passage = None
+                if passage and term_ and not passage[0].casefold().startswith(term_[1].strip()[:4]):
+                    passage = None
                 if passage and on_topic(question, passage[0]):
-                    yield "reference", passage[0], "https://ru.wikipedia.org/?curid=" + str(passage[1])
+                    yield "reference", _casual_ref(passage[0]), "https://ru.wikipedia.org/?curid=" + str(passage[1])
         # The free generator, topic associations and word completion were
         # removed from the chain in 3.0: blind checks found them mostly
         # meaningless. Their code and weights remain for comparison.
