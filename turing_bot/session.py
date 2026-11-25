@@ -146,6 +146,23 @@ _NUMWORDS = {"одно": 1, "один": 1, "одну": 1, "одна": 1, "два
 def _word_problem(question):
     q = question.casefold().replace("ё", "е")
     start = re.search(r"(?:у (?:меня|тебя|него|нее|мамы|\w+) (?:есть |было |лежит )?)?(\d+) (?:яблок|конфет|груш|мандарин|рубл|тенге|книг|карандаш|орех|печен|человек|пассажир|овец|птиц|машин)", q)
+    boxes = re.search(r"(\d+) (?:коробк|пакет|ящик|корзин|мешк|упаковк)\w* по (\d+) (?:\w+)", q)
+    if boxes and re.search(r"сколько", q):
+        start = boxes
+        value = int(boxes[1]) * int(boxes[2])
+        num = r"(\d+|" + "|".join(_NUMWORDS) + r")"
+        frac = r"(половин[ау]|треть|четверть)"
+        steps = re.finditer(r"(съел\w*|отдал\w*|потерял\w*|продал\w*|выкинул\w*|подарил\w*)\s+(?:еще |ещё )?(?:" + num + r"|" + frac + r")|(купил\w*|нашел\w*|получил\w*|дали|добавил\w*)\s+(?:еще |ещё )?(?:" + num + r"|в (два|три|четыре|2|3|4) раза больше)", q[start.end():])
+        for st in steps:
+            if st[1]:
+                if st[3]:
+                    value -= value * {"половину": 1 / 2, "половина": 1 / 2, "треть": 1 / 3, "четверть": 1 / 4}[st[3]]
+                else:
+                    value -= int(st[2]) if st[2].isdigit() else _NUMWORDS[st[2]]
+            elif st[5]:
+                value += int(st[5]) if st[5].isdigit() else _NUMWORDS[st[5]]
+        txt = str(int(value)) if value == int(value) else f"{value:.1f}".replace(".", ",")
+        return f"{txt}. {int(boxes[1]) * int(boxes[2])} всего было, дальше просто."
     if not start or not re.search(r"сколько", q):
         return None
     value = int(start[1])
@@ -182,11 +199,34 @@ def _word_problem(question):
             else:
                 n = st[5]
                 value += int(n) if n.isdigit() else _NUMWORDS[n]
+    cont = re.search(r"(?:съел|отдал|потерял|продал|выкинул|подарил|вышл)\w*\s+(?:половин\w*|треть|четверть|\d+|\w+)\s+и (?:еще|ещё) (" + "|".join(_NUMWORDS) + r"|\d+)\b", q)
+    if cont:
+        n = cont[1]
+        value -= int(n) if n.isdigit() else _NUMWORDS[n]
     if not seen:
         return None
     txt = str(int(value)) if value == int(value) else f"{value:.1f}".replace(".", ",")
     tail = " Ну, если яблоки резать." if value != int(value) else ""
     return f"{txt}. Если ничего не путаю в условии.{tail}"
+
+
+_UNITS = ("ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать")
+_TENS = ("", "", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто")
+_HUNDREDS = ("", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот")
+
+
+def _words(n):
+    if n < 20:
+        return _UNITS[n]
+    if n < 100:
+        return _TENS[n // 10] + ("" if n % 10 == 0 else " " + _UNITS[n % 10])
+    if n < 1000:
+        return _HUNDREDS[n // 100] + ("" if n % 100 == 0 else " " + _words(n % 100))
+    if n < 10000:
+        th = n // 1000
+        word = {1: "одна тысяча", 2: "две тысячи", 3: "три тысячи", 4: "четыре тысячи"}.get(th, _UNITS[th] + " тысяч")
+        return word + ("" if n % 1000 == 0 else " " + _words(n % 1000))
+    return str(n)
 
 
 class Session:
@@ -244,7 +284,7 @@ class Session:
         if not raw.strip():
             raise ValueError("Введите вопрос.")
         question = clean(raw) or raw.strip()
-        thanked = re.match(r"^(?:ну )?(?:спасибо|спс|пасиб\w*|благодарю|ок спасибо)[\s,.!()]+(?:а |и |кстати |слушай,? )?(.+)$", question, re.I)
+        thanked = re.match(r"^(?:ну )?(?:спасибо|спс|пасиб\w*|благодарю|ок спасибо)[\s,.!()…]+(?:а |и |кстати |слушай,? )?(.+)$", question, re.I)
         if thanked and len(thanked[1].split()) >= 3:
             question = thanked[1]
         self.last_source = None
@@ -332,7 +372,7 @@ class Session:
                 yield "persona", f"Запомнил, {self.user_name}. Приятно познакомиться, я Тимур.", None
         if self.turns and re.search(r"около \d+ тысяч", self.turns[-1][1]) and re.search(r"долго (?:\w+ )?(?:думал|считал)|так не считают|не посчитал", question, re.I):
             yield "follow-up", "Так я и не считал точно, прикинул на глаз. Если надо до единицы — дай минуту и листочек.", None
-        if self.first_question and re.search(r"перв\w* (?:что|сообщени|вопрос|фраз)\w*.{0,25}(?:написал|спросил|писал|сказал)|(?:написал|спросил) (?:у тебя |тебя |тебе )?(?:самым )?первым", question, re.I):
+        if self.first_question and not re.search(r"\bбы\b", question, re.I) and re.search(r"перв\w* (?:что|сообщени|вопрос|фраз)\w*.{0,25}(?:написал|спросил|писал|сказал)|(?:я )?(?:написал|спросил) (?:у тебя |тебя |тебе )?(?:самым )?первым", question, re.I):
             quoted = re.sub(r"\?\s*", ". ", self.first_question).strip(" .!")
             yield "recall", f"Ты написал: «{quoted}». Помню, помню."[:300], None
         if self.turns:
@@ -373,7 +413,7 @@ class Session:
             if "один на всех" in self.turns[-1][1] and re.search(r"почему|как так|не шесть", ql):
                 yield "follow-up", "Потому что брат один и тот же для всех трёх сестёр. Три дочери плюс один сын — четверо.", None
             shop = getattr(self, "shop", None)
-            if shop and re.search(r"ещ[её] (?:одн\w* |один )?(\w+)", ql) and re.search(r"хватил|сколько|сдач", ql):
+            if shop and not re.search(r"на сдачу", ql) and re.search(r"ещ[её] (?:одн\w* |один )?(\w+)", ql) and re.search(r"хватил|сколько|сдач", ql):
                 prices, total, paid = shop
                 item = re.search(r"ещ[её] (?:одн\w* |один )?(\w+)", ql)[1]
                 price = next((v for k, v in prices.items() if k[:4] == item[:4]), None)
@@ -401,7 +441,7 @@ class Session:
             if flock_ and re.search(r"овец|овцы|овеч", ql) and re.search(r"напомни|в той задач|сколько (?:\w+ )?осталось", ql) and not re.search(r"\d", ql):
                 yield "follow-up", f"{flock_[0]}, если со всеми прибежавшими и убежавшими.", None
             last_a = self.turns[-1][1]
-            if "Информационные системы" in last_a and re.search(r"нравится|как оно|не жалеешь", ql):
+            if "информационн" in last_a.casefold() and re.search(r"нравится|как оно|не жалеешь", ql):
                 yield "follow-up", "В целом да, программировать нравится. Матан только душит, но куда без него.", None
             if "Первая пара в восемь" in last_a and re.search(r"рано|поздно|почему так", ql):
                 yield "follow-up", "Так пара в восемь, а ещё на автобусе ехать. Будь моя воля, спал бы до десяти.", None
@@ -502,6 +542,71 @@ class Session:
                         asked = next((g for g in counts if g[:4] in ql.split("процент")[-1]), grp)
                         pct_ = new[asked] / (total_ + k) * 100
                         yield "operation", f"Примерно {pct_:.0f}%: {new[asked]} из {total_ + k}.", None
+            if re.search(r"собеседован", " ".join(t[0] for t in list(self.turns)[-1:]).casefold()) and re.search(r"у тебя (?:\w+ )?(?:было|бывало) (?:такое|так)|а ты\b", ql):
+                yield "follow-up", "Было, перед первым собеседованием на курьера, смешно звучит, но трясло. Прошло нормально, взяли.", None
+            share = re.search(r"поровну (?:на|между) (\d+|двоих|троих|трех|четверых|двух|пятерых)", ql)
+            if share:
+                k_ = {"двоих": 2, "двух": 2, "троих": 3, "трех": 3, "четверых": 4, "пятерых": 5}.get(share[1]) or int(share[1])
+                nums_ = re.findall(r"\d+", last_a)
+                if nums_ and k_:
+                    base_ = int(nums_[0])
+                    self.remainder = base_ % k_
+                    tail_ = f", и {base_ % k_} лишних остаётся" if base_ % k_ else ", ровно делится"
+                    yield "operation", f"По {base_ // k_}{tail_}.", None
+            if getattr(self, "remainder", None) and re.search(r"остат|лишн", ql):
+                yield "operation", f"Себе оставлю {self.remainder}, честно заработал)", None
+            if "во дворе" in last_a.casefold() and re.search(r"долго|давно|сколько лет", ql):
+                yield "follow-up", "Да лет до четырнадцати каждый день, пока на подготовку к ЕНТ не засадили.", None
+            if "сестра" in recent and re.search(r"созван|звонишь|общаетесь|переписыва", ql):
+                yield "follow-up", "С сестрой — когда у неё домашка горит)) А с мамой почти каждый день.", None
+            if re.search(r"получается \d+|\d+, если в уме", last_a.casefold()) and re.search(r"в уме|как (?:ты )?посчитал|калькулятор", ql):
+                yield "follow-up", "Ну да, в уме, по частям раскладываю: сначала на десятки, потом остальное. С калькулятором быстрее, но так интереснее.", None
+            if "бывают такие дни" in last_a.casefold() and re.search(r"у тебя (?:\w+ )?(?:бывают|бывает|было)|а у тебя", ql):
+                yield "follow-up", "Конечно. На прошлой неделе проспал пару, пролил чай на конспект и забыл пропуск — всё за одно утро.", None
+            if "тенге" in last_a and re.search(r"дорого или|норм (?:для|или)|это дорого", ql):
+                yield "follow-up", "Для студента норм, если не каждый день с супом и вторым. В кафешках в два раза дороже.", None
+            if "барсик" in last_a.casefold() and re.fullmatch(r"(?:а |и )?(?:давно|как давно|сколько ему|сколько лет)\W*.*", ql):
+                yield "follow-up", "Лет пять уже, котёнком с улицы подобрали. Сейчас он толще меня.", None
+            if "интерстеллар" in last_a.casefold() and re.search(r"понравил|запомнил|как тебе", ql):
+                yield "follow-up", "Очень. Сцена с волнами на планете и когда Мёрф понимает, что это был отец. Каждый раз мурашки.", None
+            if "матанализ" in last_a.casefold() and re.search(r"препод", ql):
+                yield "follow-up", "Серик Болатович, строгий. Списать нереально, но объясняет нормально, если не перебивать.", None
+            if "токио" in last_a.casefold() and re.search(r"алмат", ql):
+                yield "follow-up", "Алматы классный, но это почти как дома. Хочется чего-то совсем другого, хотя бы на время.", None
+            if getattr(self, "shortfall", None) and re.search(r"половин", ql) and re.search(r"займ|одолж|дам|даст|сколько", ql):
+                half_ = self.shortfall / 2
+                hs_ = str(int(half_)) if half_ == int(half_) else f"{half_:.1f}".replace(".", ",")
+                yield "operation", f"Ещё {hs_} найти. Половину друг закроет, половину сам.", None
+            if "сестра у всех" in last_a.casefold() and re.search(r"почему|как так", ql):
+                yield "follow-up", "Потому что сестра у всех братьев одна и та же. Три брата плюс она — четверо.", None
+            if re.search(r"буквами|словами|прописью", ql) and not re.search(r"\d", ql):
+                nums_ = re.findall(r"\b\d{1,4}\b", last_a)
+                if nums_:
+                    w_ = _words(int(nums_[0]))
+                    yield "operation", w_[:1].upper() + w_[1:] + ".", None
+            if "дедушкин" in last_a.casefold() and re.search(r"кто (?:\w+ )?подарил|откуда (?:он|у тебя)", ql):
+                yield "follow-up", "Дедушка сам отдал, когда себе новый купил. Сказал: «Береги, это классика».", None
+            if "напиши первым" in last_a.casefold() and re.search(r"не напишет|не ответит|не отвечает|если (?:она|он) (?:\w+ )?(?:не|промолчит)", ql):
+                yield "follow-up", "Тогда напиши ещё раз, но без давления. Если и дальше тишина — дай время, это тоже ответ.", None
+            if "ерлан" in recent and re.search(r"(?:чем|что) (?:\w+ )?(?:вы )?(?:обычно )?(?:занимаетесь|делаете)", ql):
+                yield "follow-up", "В доту катаем, в зал иногда ходим, готовим по очереди. Ну и сериалы вечером, если пары не убили.", None
+            if "стипенди" in last_a.casefold() and re.search(r"сколько", ql):
+                yield "follow-up", "Около сорока тысяч. Хватает впритык, если без кафешек.", None
+            shop2 = getattr(self, "shop", None)
+            if shop2 and re.search(r"сдач", ql) and re.search(r"(\d+) ?(?:тенге|тг)?", ql):
+                prices, total, _ = shop2
+                paid = int(re.search(r"(\d+)", ql)[1])
+                self.shop = (prices, total, paid)
+                self.change = paid - total
+                yield "operation", (f"{paid - total} сдачи." if paid >= total else f"Не хватит, нужно ещё {total - paid}."), None
+            if shop2 and getattr(self, "change", None) is not None and re.search(r"на сдачу|сколько ещ[её]", ql):
+                prices, _, _ = shop2
+                item = next((k for k in prices if k[:4] in ql), None)
+                if item and prices[item]:
+                    k_ = self.change // prices[item]
+                    yield "operation", f"Ещё {k_}, и {self.change - k_ * prices[item]} останется.", None
+            if "работой по айтишке" in last_a and re.search(r"почему", ql):
+                yield "follow-up", "В Караганде с айтишной работой туго, всё в Астане или Алматы. Да и к столице я уже привык.", None
             if "сестра" in recent and re.fullmatch(r"(?:а )?(?:как )?(?:\w+ )?(?:зовут|имя)(?: ее| её)?\W*", ql):
                 yield "follow-up", "Айгерим. Хотя дома все зовут Айка.", None
             if "сестра" in recent and re.search(r"(?:младше|старше) или (?:старше|младше)|она (?:младше|старше)|сколько (?:ей|ему) лет", ql):
@@ -514,6 +619,26 @@ class Session:
                 yield "follow-up", "Привык, со школы с пацанами пати собираем. Да и в кс я криворукий, честно.", None
             if re.search(r"школ", self.turns[-1][0].casefold()) and re.search(r"предмет", ql) and re.search(r"ненавид|не любил|бесил|худш", ql):
                 yield "follow-up", "Химию. Вообще не понимал, что там с чем реагирует, списывал у соседки по парте.", None
+        if self.history and re.search(r"(?:что|чего) (?:ты )?(?:\w+ )?(?:запомнил|помнишь|знаешь) (?:\w+ )?(?:обо мне|про меня)", question, re.I):
+            frags = []
+            for uq, _ in self.history:
+                for m in re.finditer(r"(?:\bя\b|\bу меня\b)([^.?!]{6,70})", uq, re.I):
+                    frag = m[0].strip(" ,")
+                    if re.search(r"\bты\b|\bтебя\b|\bтебе\b|зовут", frag, re.I):
+                        continue
+                    frag = re.sub(r"\bу меня\b", "у тебя", frag, flags=re.I)
+                    frag = re.sub(r"^я\s+", "", frag, flags=re.I)
+                    frag = re.sub(r"\bмне\b", "тебе", frag)
+                    frag = re.sub(r"\bмой\b", "твой", frag)
+                    frag = re.sub(r"\bмоя\b", "твоя", frag)
+                    frags.append(frag.split(",")[0].strip())
+            parts = []
+            if getattr(self, "user_name", None):
+                parts.append(f"что ты {self.user_name}" + (f" из {self.user_city}" if getattr(self, "user_city", None) else ""))
+            parts += frags[-2:]
+            if parts:
+                text = "Ну, " + ", ".join(parts) + ". Видишь, слушал внимательно)"
+                yield "recall", text[:1].upper() + text[1:] if len(text) <= 300 else text[:297].rsplit(" ", 1)[0] + "…", None
         ordinal = re.search(r"(?:спросил|спрашивал|написал)\w* (?:у тебя |тебя |тебе )?(втор|трет|четверт|четвёрт|пят)\w*|(втор|трет|четверт|четвёрт|пят)\w* (?:вопрос|сообщени)", question, re.I)
         if ordinal:
             idx = {"втор": 1, "трет": 2, "четв": 3, "пят": 4}[(ordinal[1] or ordinal[2]).lower()[:4] if (ordinal[1] or ordinal[2]).lower().startswith("четв") else (ordinal[1] or ordinal[2]).lower()]
@@ -532,7 +657,7 @@ class Session:
         if self.turns and self.last_route != "fallback" and RECALL_SELF.fullmatch(question):
             previous = self.turns[-1][1]
             yield "recall", previous, None
-        if self.turns and self.first_answer and re.search(r"\bперв\w* (?:вопрос|раз)\w*|в (?:самом )?начале", question, re.I) and re.search(r"\b(?:ты )?(?:ответил|сказал|отвечал)\w*", question, re.I) and not re.search(r"что у тебя|что ты из|что тебя зовут|близнец", question, re.I):
+        if self.turns and self.first_answer and re.search(r"\bперв\w* (?:вопрос|раз)\w*|в (?:самом )?начале", question, re.I) and re.search(r"\b(?:ты )?(?:ответил|сказал|отвечал)\w*", question, re.I) and not re.search(r"что у тебя|что ты из|что тебя зовут|близнец|\bпро\b|\bо (?:своем|твоем|соседе|друге)", question, re.I):
             yield "recall", f"Сказал: «{self.first_answer.rstrip('.')}». Помню, помню."[:300], None
         asked = re.search(r"(?:помнишь|напомни)\w*,? (?:что|как|о ч[её]м) я (?:тебя |тебе )?(?:спрашивал|спросил|писал|говорил)\w* (?:про|о|об|насчет|насчёт) ([а-яё]{3,})", question.casefold())
         if asked and self.history:
@@ -570,7 +695,7 @@ class Session:
                     quoted = re.sub(r"[?!.]+$", "", earlier_q).strip()
                     yield "recall", f"Ты писал: «{quoted}». Помню."[:300], None
                     break
-        about = re.search(r"\bчто (?:ты )?(?:мне |тебе )?(?:отвечал|ответил|сказал|говорил|писал)\w* (?:про|о|об|насчет|насчёт) ([а-яё]{3,})", question.casefold())
+        about = re.search(r"\bчто (?:ты )?(?:мне |тебе )?(?:отвечал|ответил|сказал|говорил|писал)\w* (?:про|о|об|насчет|насчёт) (?:своего |свою |своем |свой |твоего |твою |твоем )?([а-яё]{3,})", question.casefold())
         if about and self.history:
             stem = about[1][:4] if len(about[1]) > 4 else about[1][:3]
             for earlier_q, earlier_a in reversed(self.history):
@@ -602,6 +727,9 @@ class Session:
             chained = _chain_arithmetic(question, self.turns[-1][1])
             if chained:
                 yield "operation", chained, None
+        phrase = re.search(r"[\"«]([а-яё ]{3,30})[\"»]\s*(?:задом наперед|задом наперёд|наоборот)|(?:задом наперед|задом наперёд|наоборот)\W+[\"«]([а-яё ]{3,30})[\"»]", question, re.I)
+        if phrase and " " in (phrase[1] or phrase[2]) and not re.search(r"ошиб|опечат", question, re.I):
+            yield "operation", f"{(phrase[1] or phrase[2]).lower()[::-1]}. Доволен))", None
         plain = re.search(r"слово ([а-яё]{3,}) (?:задом наперед|задом наперёд|наоборот)|(?:задом наперед|задом наперёд|наоборот)\W+(?:слово\W+)?([а-яё]{3,})\W*$", question, re.I)
         if typo and not plain and re.search(r"задом наперед|задом наперёд|наоборот", question, re.I) and not re.search(r"ошиб|опечат", question, re.I):
             yield "operation", f"{typo[1].lower()[::-1]}. Звучит как заклинание))", None
@@ -648,7 +776,7 @@ class Session:
             self.last_trip = (v, t)
             yield "operation", f"{v * t} км: {v} на {t}.", None
         arrive = re.search(r"в (\d{1,2})(?::(\d{2}))? ?(?:утра|час\w*|ч\b|вечера)?", question, re.I)
-        legs = re.search(r"(\d+) ?км", question, re.I)
+        legs = re.search(r"(\d+) ?км(?! ?/ ?ч| в час| ?ч\b)", question, re.I)
         vel = re.search(r"скорост\w* (\d+)|(\d+) ?км ?(?:/|в) ?ч", question, re.I)
         if arrive and legs and vel and re.search(r"во сколько|когда (?:\w+ )?(?:приедет|прибудет|будет)", question, re.I):
             v_ = int(vel[1] or vel[2])
@@ -657,11 +785,26 @@ class Session:
                 start_ = int(arrive[1]) * 60 + int(arrive[2] or 0)
                 end_ = start_ + round(d_ / v_ * 60)
                 self.arrival = end_
-                yield "operation", f"В {end_ // 60 % 24}:{end_ % 60:02d}. Ехать {d_ / v_:g} ч.".replace(".", ",", 1).replace(", Ехать", ". Ехать"), None
-        late = re.search(r"опоздал\w* (?:\w+ )?на (\d+) мин", question, re.I)
+                ride = round(d_ / v_ * 60)
+                yield "operation", f"В {end_ // 60 % 24}:{end_ % 60:02d}. Ехать {ride // 60} ч" + (f" {ride % 60} мин." if ride % 60 else "."), None
+        late = re.search(r"опозда\w* (?:\w+ )?на (\d+) мин|(?:простоит|постоит|стоял|простоял|стоянк\w*|задерж\w*) (?:\w+ )?(?:на )?(\d+) мин", question, re.I)
         if late and getattr(self, "arrival", None) is not None:
-            end_ = self.arrival + int(late[1])
+            end_ = self.arrival + int(late[1] or late[2])
             yield "operation", f"Тогда в {end_ // 60 % 24}:{end_ % 60:02d}.", None
+        dt_ = re.search(r"(\d+) ?км за (\d+) час", question, re.I)
+        if dt_ and re.search(r"скорост|как быстро|сколько км в час", question, re.I):
+            d_, t_ = int(dt_[1]), int(dt_[2])
+            if t_:
+                v_ = d_ / t_
+                self.last_trip = (v_, t_)
+                yield "operation", f"{v_:g} км/ч: {d_} делим на {t_}.", None
+        far = re.search(r"(\d+) ?км", question, re.I)
+        if far and getattr(self, "last_trip", None) and re.search(r"за сколько|сколько (?:\w+ )?(?:времени|часов|ехать)", question, re.I) and not re.search(r"км ?(?:/|в) ?ч|скорост\w* \d", question, re.I):
+            v_ = self.last_trip[0]
+            if v_:
+                mins = round(int(far[1]) / v_ * 60)
+                self.last_minutes = mins
+                yield "operation", f"{mins // 60} ч" + (f" {mins % 60} мин" if mins % 60 else "") + f", если с той же скоростью {v_:g} км/ч.", None
         speed = re.search(r"(\d+) ?км ?(?:/|в) ?ч", question, re.I)
         span = re.search(r"за (\d+) час\w*(?: (?:и )?(\d+) мин\w*)?|за (\d+) мин", question, re.I)
         if not speed and span and getattr(self, "last_trip", None) and re.search(r"^(?:а |ну )?(?:если )?за ", question.casefold()):
@@ -723,7 +866,7 @@ class Session:
             b_ = a_ - int(cmp_[2]) if cmp_[3].lower() == "меньше" else a_ + int(cmp_[2])
             self.pair = (a_, b_)
             yield "operation", f"{a_ + b_}. У второго {b_}, плюс {a_} у первого.", None
-        rt = re.search(r"у (\w+) в (\d+|два|три|четыре|пять) раза больше \w+,? чем у (\w+).{0,30}?вместе (?:у них )?(\d+)", question, re.I)
+        rt = re.search(r"у (\w+) (?:\w+ )?в (\d+|два|три|четыре|пять) раза больше(?: \w+)?,? чем у (\w+).{0,30}?вместе (?:у них )?(\d+)", question, re.I)
         if rt:
             k = {"два": 2, "три": 3, "четыре": 4, "пять": 5}.get(rt[2].lower()) or int(rt[2])
             total_ = int(rt[4])
@@ -735,8 +878,8 @@ class Session:
                 val = small if not asked or asked[1][:3].lower() == rt[3][:3].lower() else big
                 yield "operation", f"{val}. Делим {total_} на {k + 1} части: одна у одного, {k} у другого.", None
         dep = re.search(r"в (\d{1,2})[:.](\d{2})", question)
-        dur = re.search(r"(\d+) час\w*(?: (?:и )?(\d+) мин\w*)?", question)
-        if dep and dur and re.search(r"во сколько|когда (?:\w+ )?(?:приедет|будет|прибудет)", question, re.I) and not re.search(r"\d+ ?км", question):
+        dur = re.search(r"(\d+) ?(?:час\w*|ч\b)(?: (?:и )?(\d+) ?мин\w*)?", question)
+        if dep and dur and re.search(r"во сколько|когда (?:\w+ )?(?:приедет|приеду|будет|буду|прибудет)", question, re.I) and not re.search(r"\d+ ?км", question):
             start_ = int(dep[1]) * 60 + int(dep[2])
             end_ = start_ + int(dur[1]) * 60 + int(dur[2] or 0)
             self.arrival = end_
@@ -784,6 +927,37 @@ class Session:
         if letters:
             n_ = letters[2].lower().count(letters[1].lower())
             yield "operation", f"{n_}. Посчитал по буквам, {letters[2].lower()}.", None
+        need = re.search(r"(?:есть|у меня) (\d+)[^.?!]{0,40}?стоит (\d+)|стоит (\d+)[^.?!]{0,40}?(?:есть|у меня) (\d+)", question, re.I)
+        if need and re.search(r"не хватает|сколько (?:\w+ )?(?:надо|нужно|добавить)", question, re.I):
+            have = int(need[1] or need[4]); price = int(need[2] or need[3])
+            if price > have:
+                self.shortfall = price - have
+                yield "operation", f"{price - have} не хватает.", None
+            else:
+                yield "operation", f"Хватает, ещё {have - price} останется.", None
+        sis = re.search(r"у (\w+) (\d+|два|три|четыре|пять) брат\w*.{0,40}у каждого .{0,25}сестр", question, re.I)
+        if sis:
+            n_ = {"два": 2, "три": 3, "четыре": 4, "пять": 5}.get(sis[2].lower()) or int(sis[2])
+            yield "operation", f"{n_ + 1}. Сестра у всех братьев одна и та же.", None
+        fruit = re.search(r"(\w+) стоит (\d+)[^.]*?,? (\w+) на (\d+) (дороже|дешевле)[^.]*?\.?.{0,25}?(\d+) (\w+) и (\d+) (\w+)", question.casefold())
+        if fruit:
+            p1 = int(fruit[2]); p2 = p1 + int(fruit[4]) if fruit[5] == "дороже" else p1 - int(fruit[4])
+            prices = {fruit[1]: p1, fruit[3]: p2}
+            total = 0
+            for qty, item in ((int(fruit[6]), fruit[7]), (int(fruit[8]), fruit[9])):
+                price = next((v for k, v in prices.items() if k[:3] == item[:3]), None)
+                if price is None:
+                    total = None
+                    break
+                total += qty * price
+            if total:
+                self.shop = (prices, total, total)
+                self.change = None
+                yield "operation", f"{total}. {fruit[3].capitalize()} по {p2}, дальше просто складываешь.", None
+        sis2 = re.search(r"у (трех|двух|четырех|пяти|\d+) брат\w* по одной сестр", question.casefold().replace("ё", "е"))
+        if sis2:
+            n_ = {"двух": 2, "трех": 3, "четырех": 4, "пяти": 5}.get(sis2[1]) or int(sis2[1])
+            yield "operation", f"{n_ + 1}. Сестра у всех братьев одна и та же.", None
         dig = re.search(r"(\d+) (?:человек\w*|землекоп\w*|рабоч\w*) (?:\w+ )?(?:копают|выкапывают|копали) (\d+) ям\w* за (\d+) час\w*.{0,40}?(\d+) (?:человек\w*|землекоп\w*|рабоч\w*) за (\d+) час", question, re.I)
         if dig:
             p1, h1, t1, p2, t2 = (int(x) for x in dig.groups())
@@ -888,7 +1062,7 @@ class Session:
             # such a «А почему?» briefly instead of inventing an argument.
             seen = {answer for _, answer in self.turns}
             parts = re.split(r"(?<=[.!:])\s+", self.turns[-1][1])
-            if self.last_route in ("profile", "persona", "tips", "reaction", "follow-up") and len(parts) >= 2 and len(parts[1]) > 20 and not parts[1].startswith("«") and not re.search(r"думать особо нечего|Без вариантов|Однозначно|не сомневаюсь|Даже представлять", parts[1]):
+            if self.last_route in ("profile", "persona", "tips", "reaction", "follow-up") and len(parts) >= 2 and len(parts[1]) > 20 and not parts[1].startswith("«") and not re.match(r"(?:Но|А|И|Хотя|Зато)\b", parts[1]) and not re.search(r"думать особо нечего|Без вариантов|Однозначно|не сомневаюсь|Даже представлять", parts[1]):
                 yield "follow-up", "Ну я же говорю: " + parts[1][:1].lower() + parts[1][1:], None
             options = [r for r in WHY_REPLIES if r not in seen]
             if options:
@@ -945,6 +1119,14 @@ class Session:
         if not parts:
             return None
         if re.search(r"докаж|бот бы не|нейросеть бы не|если бы", question, re.I):
+            return None
+        if any(re.fullmatch(r"\W*(?:а )?(?:как )?(?:его |ее |её )?(?:зовут|звать|имя)\W*", p, re.I) for p in parts):
+            return None
+        if len(parts) > 1 and re.match(r"\W*(?:ну|вот|то есть|в смысле|короче|типа|я имею в виду)\b", parts[1], re.I):
+            return None
+        if re.search(r"\?\s*(?:ну|вот|то есть|в смысле|короче|типа)\b|курс.{0,15}где учишься|где учишься.{0,15}курс", question, re.I):
+            return None
+        if any(re.match(r"\W*(?:когда|если|пока|чтобы|потому)\b", p_, re.I) for p_ in parts[1:]):
             return None
         answers = [self._precise(p) for p in parts]
         if not all(answers):
