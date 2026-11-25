@@ -258,6 +258,8 @@ def _you(text):
     for a, b in ((" я ", " ты "), (" мои ", " твои "), (" моя ", " твоя "), (" мой ", " твой "), (" мою ", " твою "), (" мне ", " тебе "), (" меня ", " тебя "), (" у меня ", " у тебя ")):
         t = t.replace(a, b)
     t = re.sub(r"^ты (?:вот|же|короче|тут) ", "ты ", t.strip())
+    t = re.sub(r"\bты (не )?(\w+?)аюсь\b", r"ты \1\2аешься", t)
+    t = re.sub(r"\bты (не )?(\w+?)ую\b", r"ты \1\2уешь", t)
     return t[:1].upper() + t[1:]
 
 
@@ -270,6 +272,7 @@ CASUAL_HOW = {
 
 
 CASUAL_DEFS = {
+    "борщ": "Суп со свёклой и капустой, красный такой, со сметаной. Мама иногда варит, но у нас чаще сорпа.",
     "плов": "Рис с мясом, морковкой и луком, всё в казане. У нас дома мама по праздникам делает.",
     "офсайд": "Это когда в момент паса нападающий ближе к воротам, чем последний защитник. Короче, нельзя заранее стоять за спинами защитников.",
     "пенальти": "Удар с одиннадцати метров, когда в штрафной сфолили. Один на один с вратарём.",
@@ -1287,7 +1290,7 @@ class Session:
                 if hit_:
                     who_ = re.search(r"(парен\w*|муж\w*|брат\w*|друг\w*)", hit_.casefold())
                     yield "recall", ("Твой парень" if not who_ or who_[1].startswith("парен") else "Твой " + who_[1]) + ", ты же говорила. Ещё немного ждать осталось)", None
-            if re.search(r"что (?:у меня )?с (?:моей )?соседк\w* (?:было|случилось)", ql):
+            if re.search(r"что (?:у меня )?с (?:моей )?соседк\w* (?:было|случилось)|(?:что|какая) .{0,25}соседк\w* .{0,10}(?:было|случилось|была)", ql):
                 hit_ = next((uq for uq, _ in self.history if "соседк" in uq.casefold()), None)
                 if hit_:
                     cl_ = next((c.strip() for c in re.split(r"[,.!(]", hit_) if "соседк" in c.casefold()), hit_)
@@ -1324,6 +1327,57 @@ class Session:
                 yield "follow-up", "История, наверное. Даты в голове не держатся, хоть убей.", None
             if "продам ноут" in last_a.casefold() and re.search(r"за ск[оа]|сколько", ql):
                 yield "follow-up", "Тыщ за сто двадцать. Он старенький, но для учёбы норм.", None
+            if re.search(r"(?:живой|человек)\w* .{0,15}(?:или|иль) .{0,10}(?:скрипт|бот|робот|программ|нейросет)", ql):
+                yield "profile", "Живой, конечно) Сижу дома, чай пью.", None
+            if re.search(r"не спрашивал|не спрашивала|не об этом", ql) and re.search(r"при ?ч[её]м|я ", ql):
+                yield "profile", "А, сорри, не так понял) Так что спросить хотел" + ("а" if getattr(self, "user_female", False) else "") + ", давай заново.", None
+            if re.search(r"свёклой|свеклой", last_a.casefold()) and re.search(r"сам (?:\w+ )?(?:вар|готов)", ql):
+                yield "follow-up", "Не, мама варит, я только ем) Сам максимум доширак.", None
+            if "мама варит" in last_a.casefold() and re.search(r"кто (?:\w+ )?научил", ql):
+                yield "follow-up", "Никто, я ж говорю, не варю) Мама пыталась научить, я отлынивал.", None
+            if "при ста градусах" in last_a and re.search(r"почему", ql):
+                yield "follow-up", "Ну вода греется, и внутри образуется пар — отсюда пузыри. Пар легче воды и вылетает наружу. Физику, честно, плохо помню)", None
+            if re.search(r"базы данных|айтишник|грант|информационн|втянулся", last_a.casefold()) and re.fullmatch(r"(?:а |и )?(?:сложно|тяжело)\W*", ql):
+                yield "follow-up", "Местами да. Матан и прога на первом курсе выносили, сейчас полегче, втянулся.", None
+            if re.search(r"(?:почему|откуда) (?:у тебя )?(?:такие )?(?:ровные|складные|грамотные) ответы|(?:слишком|подозрительно) (?:ровно|складно|грамотно)", ql):
+                yield "profile", ("Не бот) " if re.search(r"бот|нейросет|робот", ql) else "Ровные) ") + "Я просто нормально пишу, нас в школе за запятые гоняли. Хотя опечатки тоже бывают.", None
+            if re.search(r"у меня (?:там )?(?:тет|дяд|бабушк|дедушк|родствен|брат|сестр|друз)\w* .{0,20}жив", ql) and re.search(r"караганд|караг", ql + " " + last_a.casefold()):
+                yield "profile", "О, мир тесен)" + (" Я сам с Юго-Востока, почти соседи получаются." if "юго" in ql else " Я на Юго-Востоке жил, может, даже рядом."), None
+            if "когда пара в восемь" in last_a.casefold() and re.search(r"что потом|и что|дальше", ql):
+                yield "follow-up", "Потом душ, чай и бегом на пары. Обычно уже опаздывая)", None
+            if re.search(r"гитар", last_a.casefold()) and re.search(r"давно", ql):
+                yield "follow-up", "Гитару с девятого класса мучаю, а доту — со школы ещё.", None
+            ex2_ = re.search(r"(?:завтра|скоро) (?:\w+ )?экзамен по ([а-яё]+).{0,30}(?:паник|боюсь|страшно|нервнича)", ql)
+            if ex2_:
+                yield "profile", "Не паникуй, ты успеешь) Сейчас главное — пройтись по основным темам и выспаться. Рассказывай, что там самое страшное.", None
+            if re.search(r"что ты (?:мне )?(?:посоветовал|советовал)", ql):
+                adv_ = next((a for q_, a in reversed(self.history) if re.search(r"проблем|что делать|соседк|посоветуй", q_.casefold()) and not re.search(r"помнишь|какая у меня|что у меня|что я", q_.casefold())), None)
+                ex_ = getattr(self, "user_exam", None)
+                tail_ = (f" Удачи завтра на экзамене по {ex_.split('по ')[-1]}!" if ex_ and "по " in ex_ else "") + (" Пока)" if re.search(r"пока", ql) else "")
+                if adv_:
+                    first_ = re.split(r"(?<=[.!)])\s", adv_)[0]
+                    yield "recall", (first_ + tail_)[:300], None
+            if re.search(r"^ладно: «", last_a.casefold()) and re.search(r"(?:а )?(?:теперь|ещ[её]|еще) про (\w+)", ql):
+                from .profile import _poem_text
+                yield "profile", _poem_text(re.search(r"про (\w+)", ql)[1], ql), None
+            if "31 oct" in last_a and re.search(r"не смешно|другую|ещ[её]", ql):
+                yield "follow-up", "Ладно, другая: студент приходит на экзамен с лестницей, говорит — сказали, спрашивать будут на высшем уровне. Если и это не смешно, я пас)", None
+            if re.search(r"лестниц|высший уровень", last_a.casefold()) and re.search(r"не смешно|другую|ещ[её]", ql):
+                yield "follow-up", "Ладно, вот: программисты путают Хэллоуин и Рождество, потому что 31 oct = 25 dec. Если и это не смешно, я пас)", None
+            if re.search(r"(?:шутк|анекдот)\w* .{0,30}программист|программист\w* .{0,25}(?:шутк|анекдот)", ql):
+                yield "profile", "Программисты путают Хэллоуин и Рождество, потому что 31 oct = 25 dec. Смешно только айтишникам, знаю)", None
+            lt3_ = getattr(self, "last_trip", None)
+            st_ = re.search(r"(?:стоит|стоянк\w*|останавливается) (?:\w+ )?(полчаса|час|\d+ мин\w*)", ql)
+            if lt3_ and st_ and re.search(r"полпути|по пути|на станции", ql):
+                add_ = 0.5 if st_[1] == "полчаса" else 1 if st_[1] == "час" else int(re.match(r"\d+", st_[1])[0]) / 60
+                tot_ = lt3_[1] + add_
+                yield "operation", f"Тогда {tot_:g}".replace(".", ",") + f" часа: {lt3_[1]:g} в пути и {st_[1]} стоянка.", None
+            if re.search(r"шестидесят", last_a.casefold()) and re.search(r"будущ", ql):
+                yield "follow-up", "В будущем непонятно что будет, а шестидесятые хотя бы знаю, что классные были)", None
+            if re.search(r"килограмм есть килограмм", last_a.casefold()) and re.search(r"на луне", ql):
+                yield "follow-up", "На Луне весы покажут меньше у обоих, но поровну. Масса-то одинаковая.", None
+            if "юпитер" in last_a.casefold() and re.search(r"(?:лун|спутник)", ql):
+                yield "follow-up", "Под сотню уже, их всё открывают и открывают. Самые известные — Ио, Европа, Ганимед и Каллисто.", None
             if "наушники" in last_a.casefold() and re.fullmatch(r"(?:а |и )?(?:давно|как давно)\W*", ql):
                 yield "follow-up", "Наушники с первого курса, мама на поступление подарила. Брелок — с девятого класса.", None
             if "упал со сцены" in last_a and re.search(r"что (?:было )?потом|и что|дальше", ql):
@@ -1597,6 +1651,10 @@ class Session:
             need_ = M_ / (m_ / (k_ * t_) * T_)
             self.cats_ = (k_, t_, m_, T_, M_, need_)
             yield "operation", f"{need_:g}. Каждая кошка ловит мышь за {k_ * t_ / m_:g} минуты, так что {need_:g} кошки за {T_} минут как раз поймают {M_}.", None
+        rt_ = re.search(r"корень из (\d+)", question, re.I)
+        if rt_:
+            v_ = math.sqrt(int(rt_[1]))
+            yield "operation", (f"{v_:g}, ровно." if v_ == int(v_) else f"Примерно {v_:.2f}".replace(".", ",") + ". Дальше без калькулятора не скажу)"), None
         trip_ = getattr(self, "last_trip", None)
         back_v = re.search(r"(?:обратн\w*|назад).{0,30}?(\d+)(?: ?км)?|(\d+) ?км ?(?:/|в) ?ч\w*.{0,20}обратн", question, re.I)
         if trip_ and back_v and re.search(r"сколько (?:\w+ )?времени|за сколько|за ск[оа]к|сколько (?:\w+ )?час|^а если|обратн", question, re.I):
@@ -1607,7 +1665,8 @@ class Session:
                 t2_ = d_ / v2_
                 self.trip_back = (d_, t1_, t2_)
                 m_ = round(t2_ * 60)
-                yield "operation", f"{m_ // 60} ч" + (f" {m_ % 60} мин" if m_ % 60 else "") + f": {d_:g} км делим на {v2_}.", None
+                if not re.search(r"средн", question, re.I):
+                    yield "operation", f"{m_ // 60} ч" + (f" {m_ % 60} мин" if m_ % 60 else "") + f": {d_:g} км делим на {v2_}.", None
         tb_ = getattr(self, "trip_back", None)
         if tb_ and re.search(r"средн\w* скорост", question, re.I):
             d_, t1_, t2_ = tb_
