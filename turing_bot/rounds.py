@@ -191,7 +191,7 @@ class Abstentions:
         if re.search(r"\b(?:мысленно|загадал\w*|задумал\w*|у меня в (?:руке|кармане)|о чем я думаю)\b", normalized):
             topical.append("Я ж не экстрасенс) Дай хоть подсказку, тогда попробую.")
         if re.search(r"\b(?:кто|куда|где)\b", normalized) and re.search(r"\b(?:у меня|мой|моя|моей|мою|я вчера|я положил\w*)\b", normalized):
-            topical.append("Я этого не видел. По твоему описанию уверенно восстановить, что произошло, у меня не выходит.")
+            topical.append("Не знаю, я ж этого не видел) Расскажи подробнее.")
         for expr, replies in TYPED:
             if expr.search(normalized.strip()):
                 topical.extend(replies)
