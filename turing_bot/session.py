@@ -221,6 +221,9 @@ class Session:
         if self.first_question and re.search(r"перв\w* (?:что|сообщени|вопрос|фраз)\w*.{0,25}(?:написал|спросил|писал|сказал)|(?:написал|спросил) (?:тебе )?(?:самым )?первым", question, re.I):
             quoted = re.sub(r"\?\s*", ". ", self.first_question).strip(" .!")
             yield "recall", f"Ты написал: «{quoted}». Помню, помню."[:300], None
+        if re.search(r"(?:ты )?меня запомнишь|не забудешь меня", question, re.I):
+            who = f", {self.user_name}" if self.user_name else ""
+            yield "persona", f"Конечно{who}. Не каждый день так допрашивают, такое не забывается.", None
         if asks_name:
             if self.user_name:
                 yield "recall", f"{self.user_name}, конечно. Ты же говорил, я запомнил.", None
@@ -609,6 +612,10 @@ class Session:
             return "Так это фильмы, не сериалы. Из совсем лёгких — «1+1»: полтора часа, и настроение на весь вечер."
         if re.search(r"брос", earlier) and re.search(r"родител", q) and re.search(r"поругал|поссорил|скандал", q):
             return "Тогда тем более поддержал бы. Позвал бы к нам переночевать, а с родителями пусть поговорит потом, когда все остынут."
+        if self.last_route not in (None, "fallback", "retrieval") and re.search(r"^(?:а |ну |кстати,? )*(?:ты )?(?:сам|сам-то) (?:как )?думаешь|а ты как думаешь", q) and len(q) < 60:
+            first = re.split(r"(?<=[.!])\s", previous, maxsplit=1)[0].rstrip(".")
+            if len(first) > 15 and not first.startswith(("Сказал бы", "«")):
+                return "Ну я же сказал: " + first[:1].lower() + first[1:] + ". Так и думаю."
         if self.last_route == "explanation" and re.search(r"у тебя (?:\w+ )?(?:так|тоже|такое) (?:\w+ )?бывает|ты (?:сам )?(?:тоже|так) (?:\w+ )?(?:делаешь|чувствуешь)", q):
             return "Бывает, конечно, я же тоже человек. Особенно в сессию, когда темнеет в пять."
         if re.search(r"завал|двойк|пересда", earlier + " " + previous) and re.search(r"орать|ругать|кричать|наругают", q):
