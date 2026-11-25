@@ -249,7 +249,11 @@ class Session:
             for earlier_q, earlier_a in reversed(self.history):
                 if stem in earlier_q.casefold():
                     first = re.split(r"(?<=[.!])\s", earlier_a, maxsplit=1)[0].rstrip(".")
-                    yield "recall", f"Помню, конечно: «{first}»."[:300], None
+                    if first.startswith("Сказал бы"):
+                        inner = re.sub(r"^Сказал бы:?\s*", "", first).strip("«» ")
+                        yield "recall", f"Помню, конечно. Я бы сказал: «{inner}»."[:300], None
+                    else:
+                        yield "recall", f"Помню, конечно: «{first}»."[:300], None
                     break
         about = re.search(r"\bчто (?:ты )?(?:отвечал|ответил|сказал|говорил|писал)\w* (?:про|о|об|насчет|насчёт) ([а-яё]{3,})", question.casefold())
         if about and self.history:
