@@ -813,6 +813,17 @@ class Session:
                     bus_["out"].append(out2)
                     bus_["after"] = k_
                     yield "operation", f"{k_} остаётся. Вышли {out2}.", None
+                elif re.search(r"(половин\w*|треть|четверть) (?:\w+ )?вышл|вышл\w* (?:\w+ )?(половин\w*|треть|четверть)", ql):
+                    fq_ = re.search(r"половин|треть|четверть", ql)[0]
+                    div_ = {"пол": 2, "тре": 3, "чет": 4}[fq_[:3]]
+                    word_ = {2: "два", 3: "три", 4: "четыре"}[div_]
+                    if bus_["after"] % div_:
+                        yield "operation", f"Там же {bus_['after']}, на {word_} не делится. Кто-то наполовину вышел, что ли) Задачка кривая.", None
+                    else:
+                        out2 = bus_["after"] // div_
+                        bus_["out"].append(out2)
+                        bus_["after"] -= out2
+                        yield "operation", f"{bus_['after']}. Вышли {out2}.", None
                 elif re.search(r"сколько (?:\w+ )?(?:всего )?вышл", ql) and len(bus_["out"]) > 1:
                     yield "operation", f"{sum(bus_['out'])}: {bus_['out'][0]} на первой и {bus_['out'][1]} на второй.", None
             if "вчера плов" in last_a.casefold() and re.fullmatch(r"(?:а |и )?(?:давно|как давно)\W*", ql):
@@ -868,6 +879,25 @@ class Session:
                 yield "operation", "86400. Двадцать четыре часа на 3600 секунд.", None
             if re.search(r"минут\w* в (?:сутк|дн[её])", ql):
                 yield "operation", "1440. Двадцать четыре на шестьдесят.", None
+            if re.search(r"суп и плов|столовк", last_a.casefold()) and re.fullmatch(r"(?:а |и )?(?:сколько (?:это )?(?:стоит|выходит)|почем|по ч[её]м)\W*", ql):
+                yield "follow-up", "Суп с пловом где-то тысяча двести, с чаем тысяча триста. Для студента норм.", None
+            if "будильник" in last_a.casefold() and re.search(r"как (?:\w+ )?зовут|кто (?:это|он)", ql):
+                yield "follow-up", "Ерлан, сосед мой. Сам встаёт в шесть, и ему скучно одному)", None
+            if "термокружк" in last_a.casefold() and re.search(r"зачем|серь[её]зно|почему", ql):
+                yield "follow-up", "Ну а что, в столовке чай по двести, а тут свой из дома. За месяц окупилась)", None
+            if "родной город" in last_a.casefold() and re.fullmatch(r"(?:а |и )?(?:почему|чего так|а чего)\W*", ql):
+                yield "follow-up", "Там все свои: родители, сестра, друзья со школы. А в Астане пока только Ерлан да одногруппники.", None
+            if re.search(r"попробуй сама написать|попробуй сам написать", last_a.casefold()) and re.search(r"занят|нормальн|наверное|вроде", ql):
+                yield "follow-up", "Тогда не накручивай себя. Напиши что-нибудь лёгкое, без претензий, и не проверяй телефон каждые пять минут.", None
+            if re.search(r"как (?:\w+ )?(?:зовут|звали) мо\w+ (?:кот|кошк|собак|пс|пес|хомяк|попуга)", ql):
+                said_ = next((uq for uq, _ in self.history if re.search(r"(?:кот|кошк|собак|пес|пса)\w* (?:\w+ )?зовут", uq.casefold())), None)
+                nm_m = said_ and re.search(r"зовут (\w+)", said_, re.I)
+                if nm_m:
+                    yield "recall", f"{nm_m[1].capitalize()}, ты же говорил{'а' if getattr(self, 'user_female', False) else ''})", None
+                else:
+                    paws_ = any(re.search(r"три лап|тр[её]хлап", uq.casefold()) for uq, _ in self.history)
+                    g_ = "а" if getattr(self, "user_female", False) else ""
+                    yield "recall", (f"Имя ты не говорил{g_}, только что он на трёх лапах и всех обгоняет. Скажи, запомню)" if paws_ else f"Имя ты вроде не говорил{g_}. Скажи, запомню)"), None
             if "наушники" in last_a.casefold() and re.fullmatch(r"(?:а |и )?(?:давно|как давно)\W*", ql):
                 yield "follow-up", "Наушники с первого курса, мама на поступление подарила. Брелок — с девятого класса.", None
             if "упал со сцены" in last_a and re.search(r"что (?:было )?потом|и что|дальше", ql):
