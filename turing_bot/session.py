@@ -234,6 +234,15 @@ class Session:
             yield "recall", previous, None
         if self.turns and self.first_answer and re.search(r"\bперв\w* (?:вопрос|раз)\w*|в (?:самом )?начале", question, re.I) and re.search(r"\b(?:ты )?(?:ответил|сказал|отвечал)\w*", question, re.I):
             yield "recall", f"Сказал: «{self.first_answer.rstrip('.')}». Помню, помню."[:300], None
+        asked = re.search(r"(?:помнишь|напомни)\w*,? (?:что|как|о ч[её]м) я (?:тебя |тебе )?(?:спрашивал|спросил|писал|говорил)\w* (?:про|о|об|насчет|насчёт) ([а-яё]{3,})", question.casefold())
+        if asked and self.history:
+            stem = asked[1][:5]
+            for earlier_q, earlier_a in reversed(self.history):
+                if stem in earlier_q.casefold():
+                    quoted = re.sub(r"[?!.]+$", "", earlier_q).strip()
+                    first = re.split(r"(?<=[.!])\s", earlier_a, maxsplit=1)[0].rstrip(".")
+                    yield "recall", f"Помню: ты спрашивал «{quoted}», а я сказал «{first}»."[:300], None
+                    break
         about = re.search(r"\bчто (?:ты )?(?:отвечал|ответил|сказал|говорил|писал)\w* (?:про|о|об|насчет|насчёт) ([а-яё]{3,})", question.casefold())
         if about and self.history:
             stem = about[1][:5]
