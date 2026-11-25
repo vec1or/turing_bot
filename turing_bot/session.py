@@ -263,6 +263,8 @@ class Session:
             yield "reflection" if is_reflection else "abstention", caveat, None
         if self.turns and re.search(r"Караганд|Астан", self.turns[-1][1]) and re.search(r"(?:холодно|мороз|погода|тепло).{0,15}(?:сейчас|щас)|(?:сейчас|щас).{0,15}(?:холодно|мороз|погода|тепло)", question, re.I):
             yield "follow-up", "Сейчас уже минус десять-пятнадцать, а с ветром кажется все минус двадцать пять. Ноябрь, что ты хочешь.", None
+        if self.turns and re.search(r"спис|отказ", self.turns[-1][0] + " " + self.turns[-1][1]) and re.search(r"обидел|обидится", question, re.I):
+            yield "follow-up", "Ну обиделся и обиделся. Я ему ничего не должен, а разобраться помочь предлагал.", None
         if self.turns and re.search(r"опозд|ждал", self.turns[-1][0] + " " + self.turns[-1][1]) and re.search(r"не извинил|даже не извин|без извинен", question, re.I):
             yield "reaction", "Тогда я бы уже обиделся. Сказал бы: «Ты даже не извинишься. Окей, в следующий раз жди ты». И правда бы так сделал.", None
         if self.turns and self.last_route == "reaction" and re.match(r"^(?:а|но|и) (?:если|когда|он|она|вдруг)\b", question, re.I):
@@ -572,6 +574,12 @@ class Session:
             return "Чая чашек пять, кофе одну, и то в сессию. Энергетики — почти никогда."
         if re.search(r"деда", previous + " " + " ".join(a for _, a in list(self.turns)[-2:])) and re.search(r"заплати|денег|тысяч|\d+\s*к\b|продал", q):
             return "Даже за сто тысяч нет. Это память, такое не продаётся."
+        if "автобус" in previous and "проспал" in previous and re.search(r"поверил|поверит", q):
+            return "Конечно нет. Посмеялся и отметил опоздание, но с тех пор я отмазки заранее продумываю."
+        if re.search(r"миллион", earlier + " " + previous) and re.search(r"\d+ миллион|десять миллион|10 млн|лям", q):
+            return "За десять миллионов я бы и год без телефона просидел. Родителям квартиру, остальное — на учёбу в Японии."
+        if re.search(r"оперативк|Ryzen|ноут", previous) and re.search(r"\bмак\w*|макбук|apple", q):
+            return "Мак красивый, но дорогой, да и часть программ для учёбы только под винду. За эти деньги лучше нормальный ноут на винде."
         if "гречку" in previous and re.search(r"бесят|бесит|конкретно|чем именно", q):
             return "Ну гречку мою доедает, а ночью в доту орёт, хоть и в наушниках. Но это мелочи, он нормальный."
         if re.search(r"девушк|подкат", earlier) and re.search(r"наушник", q):
