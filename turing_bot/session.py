@@ -358,6 +358,9 @@ class Session:
         if not raw.strip():
             raise ValueError("Введите вопрос.")
         question = clean(raw) or raw.strip()
+        question = re.sub(r"\bск[оа]к[оа]?\b", "сколько", question, flags=re.I)
+        question = re.sub(r"\bщас\b", "сейчас", question, flags=re.I)
+        question = re.sub(r"\bучишся\b", "учишься", question, flags=re.I)
         thanked = re.match(r"^(?:ну )?(?:спасибо|спс|пасиб\w*|благодарю|ок спасибо)[\s,.!()…]+(?:а |и |кстати |слушай,? )?(.+)$", question, re.I)
         if thanked and len(thanked[1].split()) >= 3 and not re.match(r"(?:что|за|тебе|большое|огромное)\b", thanked[1], re.I):
             question = thanked[1]
@@ -1268,7 +1271,7 @@ class Session:
                 if bits_:
                     j_ = ", ".join(bits_)
                     yield "recall", j_[:1].upper() + j_[1:] + ", ты же говорил" + ("а" if getattr(self, "user_female", False) else "") + ")", None
-            if "пока нету" in last_a and re.search(r"почему|давно", ql) and len(ql) < 30:
+            if "пока нету" in last_a and re.search(r"почему", ql) and len(ql) < 30:
                 yield "follow-up", "Хз, не встретил пока никого. Да и учёба, времени особо нет.", None
             if re.search(r"все,? кроме", last_a.casefold()) and re.search(r"кроме половины", ql):
                 n_ = next((int(m[1]) for m in (re.search(r"(\d+) овец", uq) for uq, _ in reversed(self.history)) if m), None)
@@ -1587,6 +1590,28 @@ class Session:
                     cl_ = next((c.strip() for c in re.split(r"[,.!(]", hit_) if "соседк" in c.casefold()), hit_)
                     cl_ = re.sub(r"^(?:слушай|ну|а|короче)\s+", "", cl_, flags=re.I)
                     yield "recall", f"Ну {_you(cl_)[:1].lower() + _you(cl_)[1:]}, ты ж рассказывала. Помирились хоть?".replace("?", ")"), None
+            if re.search(r"(?:машина|робот|бот|скрипт|нейросеть) или (?:нет|человек)", ql):
+                yield "profile", "Не, человек) С чего такие подозрения.", None
+            if re.fullmatch(r"(?:а |ну )?лет сколько\W*|(?:а )?сколько лет\W*", ql):
+                yield "profile", "Девятнадцать, второй курс.", None
+            if re.search(r"информационн", last_a.casefold()) and re.search(r"нравится", ql) and len(ql) < 35:
+                yield "follow-up", "В целом да, программировать нравится. Матан только душит, но куда без него.", None
+            if re.search(r"(?:ты же|ты ведь|сам же) (?:сам )?(?:писал|говорил).{0,25}помнишь", ql):
+                yield "profile", "Да не писал я такого) Ты меня с кем-то путаешь.", None
+            if "пока нету" in last_a and re.search(r"давно", ql) and len(ql) < 30:
+                yield "follow-up", "Да уже года полтора, после выпускного где-то.", None
+            pet_ = re.search(r"у меня (?:дома )?(?:кот|кошка|собака|пес|пёс)\w* ([а-яё]{3,})", ql)
+            if pet_ and pet_[1] not in ("есть", "толстый", "был", "живет", "живёт", "такой", "такая"):
+                self.user_pet = pet_[1].capitalize()
+                yield "profile", ("Ахах, у нас дома тоже кот Барсик! Видимо, все Барсики толстые и наглые)" if pet_[1] == "барсик" else f"Ахах, {self.user_pet} — классное имя) Мой Барсик тоже толстый и наглый."), None
+            if getattr(self, "user_pet", None) and re.search(r"как (?:\w+ )?(?:зовут|звали) мо\w+ (?:кот|кошк|собак|пс|пес)|как мо\w+ (?:кот|кошк|собак|пс|пес)\w* (?:зовут|звали)", ql):
+                yield "recall", f"{self.user_pet} же" + (", как мой)" if self.user_pet == "Барсик" else ")"), None
+            if "миллион" in self.turns[-1][0].casefold() and re.search(r"можно (?:было )?уехать", ql):
+                yield "follow-up", "Попутешествовал бы, в Японию первым делом. Но жить всё равно, наверное, тут остался бы.", None
+            if re.search(r"перенесли", ql) and re.search(r"столиц", ql) and re.search(r"когда|год", ql):
+                yield "profile", "В 97-м, из Алматы. А в 98-м официально объявили.", None
+            if re.search(r"как ходит конь|конь (?:\w+ )?ходит", ql):
+                yield "profile", ("Немного, дедушка учил. " if re.search(r"играешь", ql) else "") + "Конь ходит буквой Г: две клетки прямо и одну вбок. И перепрыгивать может.", None
             if "наушники" in last_a.casefold() and re.fullmatch(r"(?:а |и )?(?:давно|как давно)\W*", ql):
                 yield "follow-up", "Наушники с первого курса, мама на поступление подарила. Брелок — с девятого класса.", None
             if "упал со сцены" in last_a and re.search(r"что (?:было )?потом|и что|дальше", ql):
@@ -2161,6 +2186,20 @@ class Session:
             one_s = "одну яму" if one == 1 else f"{one:g} ямы"
             self.dig_explain = f"Один человек за {t1} ч копает {one_s}. За {t2} ч — уже {one * t2 / t1:g}. А {p2} человек — в {p2} раз больше, вот и {ts}."
             yield "operation", f"{ts}. Не {h1}, как хочется сказать сразу.", None
+        LEGS_ = (("паук", 8), ("осьминог", 8), ("кош", 4), ("кот", 4), ("собак", 4), ("коров", 4), ("лошад", 4), ("овец", 4), ("овц", 4), ("кур", 2), ("птиц", 2), ("утк", 2), ("гус", 2), ("человек", 2), ("муравь", 6), ("жук", 6), ("муха", 6), ("мух", 6))
+        if re.search(r"сколько (?:\w+ )?(?:ног|лап)", question, re.I):
+            pairs_ = []
+            for n_, w_ in re.findall(r"(\d+) ([а-яё]+)", question.casefold()):
+                lg_ = next((l for st, l in LEGS_ if w_.startswith(st)), None)
+                if lg_:
+                    pairs_.append((int(n_), w_, lg_))
+            if pairs_:
+                tot_ = sum(n * l for n, _, l in pairs_)
+                self.legs_ = tot_
+                parts_ = ", ".join(f"{w} по {l} — {n * l}" for n, w, l in pairs_)
+                yield "operation", f"{tot_}: {parts_}." if len(pairs_) > 1 else f"{tot_}: {pairs_[0][0]} на {pairs_[0][2]}.", None
+        if getattr(self, "legs_", None) and re.search(r"тр[её]хлап|без (?:одной )?лап|одна (?:\w+ )?без лапы", question, re.I):
+            yield "operation", f"Тогда {self.legs_ - 1})", None
         flock = re.search(r"(\d+) (\w+)\W.{0,30}вс[еи] кроме (\d+)", question, re.I)
         if flock:
             self.flock = [int(flock[3]), int(flock[1]) - int(flock[3]), flock[2]]
